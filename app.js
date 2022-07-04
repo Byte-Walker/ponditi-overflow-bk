@@ -36,7 +36,7 @@ app.post('/signup', (req, res) => {
           );`;
 
     const insert_user_tbl = `INSERT INTO user_tbl(user_email, user_pass, user_name, img_url)
-          VALUES ('${user.user_email}', '${user.user_pass}', '${user.name}', '${user.img_url}');`;
+          VALUES ('${user.user_email}', '${user.user_pass}', '${user.user_name}', '${user.img_url}');`;
 
     db.query(insert_user_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -101,13 +101,13 @@ app.post('/updateprofile', (req, res) => {
     WHERE user_email = '${user_email}'`;
 
     db.query(update_profile, (err, rows, fields) => {
-        if(err) {
-            console.log("Error from update profile: " + err.code);
+        if (err) {
+            console.log('Error from update profile: ' + err.code);
             res.send(false);
         } else {
             res.send(true);
         }
-    })
+    });
 });
 
 // Question route
@@ -216,6 +216,26 @@ VALUES ('${Date.now()}', '${answerInfo.question_id}', '${
     });
 });
 
+// Get user specific questions
+app.get('/getuserquestions/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
+
+    // const user_email = 'mdshahidulridoy@gmail.com';
+
+    const get_user_questions = `SELECT question_id, question_description, time
+    FROM question_tbl
+    NATURAL JOIN user_tbl
+    WHERE user_email = '${user_email}'`;
+
+    db.query(get_user_questions, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
 // Get all questions
 app.get('/getallquestions', (req, res) => {
     const get_all_questions = `SELECT user_email, question_id, question_description, user_name, time
@@ -230,12 +250,28 @@ app.get('/getallquestions', (req, res) => {
     });
 });
 
+// Get user specific answers
+app.get('/getuseranswers/:user_email', (req, res) => {
+    let user_email = req.params.user_email;
+    const get_user_answers = `SELECT question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, img_url
+  FROM question_tbl, answer_tbl, user_tbl
+  WHERE question_tbl.question_id = answer_tbl.question_id and answer_tbl.user_email = user_tbl.user_email and user_tbl.user_email = '${user_email}'`;
+
+    db.query(get_user_answers, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
 // Get all answers
 app.get('/getallanswers', (req, res) => {
-    const get_all_questions = `SELECT answer_tbl.user_email, question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_name, img_url
+    const get_all_answers = `SELECT answer_tbl.user_email, question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_name, img_url
   FROM question_tbl, answer_tbl, user_tbl
   WHERE question_tbl.question_id = answer_tbl.question_id and answer_tbl.user_email = user_tbl.user_email`;
-    db.query(get_all_questions, (err, rows, fields) => {
+    db.query(get_all_answers, (err, rows, fields) => {
         if (err) {
             console.error(err.code);
         } else {
