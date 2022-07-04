@@ -16,6 +16,11 @@ const db = mysql.createConnection({
 
 db.connect();
 
+// home route
+app.get('/', (req, res) => {
+    res.send('Server is running at port ' + port);
+});
+
 // Signup route
 app.post('/signup', (req, res) => {
     const user = req.body;
@@ -24,7 +29,10 @@ app.post('/signup', (req, res) => {
           user_email varchar(100) PRIMARY KEY NOT NULL ,
           user_pass varchar(100),
           user_name varchar(50),
-          img_url varchar(1000)
+          img_url varchar(1000),
+          job varchar(50),
+          study varchar(50),
+          location varchar(50)
           );`;
 
     const insert_user_tbl = `INSERT INTO user_tbl(user_email, user_pass, user_name, img_url)
@@ -80,6 +88,26 @@ app.post('/login', (req, res) => {
             }
         }
     });
+});
+
+// Update profile
+app.post('/updateprofile', (req, res) => {
+    const { user_email, job, study, location } = req.body;
+
+    // const user_email = 'mdshahidulridoy@gmail.com', job = 'googler', study = 'buet', location = 'new york city';
+
+    const update_profile = `UPDATE user_tbl
+    SET job = '${job}', study = '${study}', location = '${location}'
+    WHERE user_email = '${user_email}'`;
+
+    db.query(update_profile, (err, rows, fields) => {
+        if(err) {
+            console.log("Error from update profile: " + err.code);
+            res.send(false);
+        } else {
+            res.send(true);
+        }
+    })
 });
 
 // Question route
