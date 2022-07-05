@@ -82,6 +82,7 @@ app.post('/login', (req, res) => {
         } else {
             user = rows[0];
             if (requestedUser.user_pass === user?.user_pass) {
+                delete user.user_pass;
                 res.json(user);
             } else {
                 res.send(false);
@@ -105,7 +106,16 @@ app.post('/updateprofile', (req, res) => {
             console.log('Error from update profile: ' + err.code);
             res.send(false);
         } else {
-            res.send(true);
+            const fetch_user = `SELECT * FROM user_tbl 
+                WHERE user_email = '${user_email}';`;
+            db.query(fetch_user, (err, rows, fields) => {
+                if (err) {
+                    console.log('Error from fetch user: ' + err.code);
+                } else {
+                    delete rows[0].user_pass;
+                    res.send(rows[0]);
+                }
+            });
         }
     });
 });
