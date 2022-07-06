@@ -263,7 +263,7 @@ app.get('/getallquestions', (req, res) => {
 // Get user specific answers
 app.get('/getuseranswers/:user_email', (req, res) => {
     let user_email = req.params.user_email;
-    const get_user_answers = `SELECT question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, img_url
+    const get_user_answers = `SELECT question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_tbl.user_email, user_tbl.user_name, user_tbl.img_url
   FROM question_tbl, answer_tbl, user_tbl
   WHERE question_tbl.question_id = answer_tbl.question_id and answer_tbl.user_email = user_tbl.user_email and user_tbl.user_email = '${user_email}'`;
 
