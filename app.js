@@ -126,7 +126,7 @@ app.post('/createquestion', (req, res) => {
 
     const create_question_tbl = `CREATE TABLE question_tbl(
       question_id varchar(100) PRIMARY KEY NOT NULL,
-      question_description varchar(200),
+      question_description varchar(500),
       user_email varchar(50),
       time varchar(20)
       );`;
@@ -263,7 +263,7 @@ app.get('/getallquestions', (req, res) => {
 // Get user specific answers
 app.get('/getuseranswers/:user_email', (req, res) => {
     let user_email = req.params.user_email;
-    const get_user_answers = `SELECT question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_tbl.user_email, user_tbl.user_name, user_tbl.img_url
+    const get_user_answers = `SELECT *
   FROM question_tbl, answer_tbl, user_tbl
   WHERE question_tbl.question_id = answer_tbl.question_id and answer_tbl.user_email = user_tbl.user_email and user_tbl.user_email = '${user_email}'`;
 
@@ -271,6 +271,9 @@ app.get('/getuseranswers/:user_email', (req, res) => {
         if (err) {
             console.error(err.code);
         } else {
+            rows.forEach((row) => {
+                delete row.user_pass;
+            })
             res.send(rows);
         }
     });
