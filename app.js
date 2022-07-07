@@ -112,42 +112,42 @@ app.post('/signup', (req, res) => {
 app.post('/login', (req, res) => {
     const requestedUser = req.body;
 
-    let fetched_user;
-    const fetch_user_query = `SELECT * FROM user_tbl 
-    WHERE user_email = '${requestedUser.user_email}';`;
-
-    db.query(fetch_user_query, (err, rows, fields) => {
-        if (err) {
-            console.log('Error fetching data: ', err.code);
-            res.send(false);
-        } else {
-            fetched_user = rows[0];
-        }
-    });
-
-    if (requestedUser.user_pass === fetched_user.user_pass) {
-        delete fetched_user.user_pass;
-        res.send(fetched_user);
-    } else {
-        res.send(false);
-    }
-
-    // let user;
-    // const fetch_user = `SELECT * FROM user_tbl
+    // let fetched_user;
+    // const fetch_user_query = `SELECT * FROM user_tbl 
     // WHERE user_email = '${requestedUser.user_email}';`;
-    // db.query(fetch_user, (err, rows, fields) => {
+
+    // db.query(fetch_user_query, (err, rows, fields) => {
     //     if (err) {
-    //         console.log('Error from /login: ', err);
+    //         console.log('Error fetching data: ', err.code);
+    //         res.send(false);
     //     } else {
-    //         user = rows[0];
-    //         if (requestedUser.user_pass === user?.user_pass) {
-    //             delete user.user_pass;
-    //             res.json(user);
-    //         } else {
-    //             res.send(false);
-    //         }
+    //         fetched_user = rows[0];
     //     }
     // });
+
+    // if (requestedUser?.user_pass === fetched_user?.user_pass) {
+    //     delete fetched_user.user_pass;
+    //     res.send(fetched_user);
+    // } else {
+    //     res.send(false);
+    // }
+
+    let user;
+    const fetch_user = `SELECT * FROM user_tbl
+    WHERE user_email = '${requestedUser.user_email}';`;
+    db.query(fetch_user, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from /login: ', err);
+        } else {
+            user = rows[0];
+            if (requestedUser.user_pass === user?.user_pass) {
+                delete user.user_pass;
+                res.json(user);
+            } else {
+                res.send(false);
+            }
+        }
+    });
 });
 
 app.get('/sociallogin', (req, res) => {
@@ -160,18 +160,16 @@ app.get('/sociallogin', (req, res) => {
         if (err?.code) {
             console.log('Error fetching data: ', err.code);
             res.send(false);
-            
         } else {
             delete rows[0]?.user_pass;
             res.send(rows.length);
         }
     });
-    
 });
 
 app.get('/profile/:user_email', (req, res) => {
     const user_email = req.params.user_email;
-    
+
     const fetch_user_query = `SELECT * FROM user_tbl 
     WHERE user_email = '${user_email}';`;
 
@@ -179,14 +177,12 @@ app.get('/profile/:user_email', (req, res) => {
         if (err?.code) {
             console.log('Error fetching data: ', err.code);
             res.send(false);
-            
         } else {
             delete rows[0]?.user_pass;
             res.send(rows[0]);
         }
     });
-})
-
+});
 
 // Update profile
 app.post('/updateprofile', (req, res) => {
@@ -216,8 +212,6 @@ app.post('/updateprofile', (req, res) => {
         }
     });
 });
-
-
 
 // Question route
 app.post('/createquestion', (req, res) => {
@@ -390,6 +384,26 @@ app.get('/getallanswers', (req, res) => {
             res.send(rows);
         }
     });
+});
+
+// get all the answers on a specific question
+app.get('/answers/:question_id', (req, res) => {
+    const question_id = req.params.question_id;
+
+    const query = `
+        SELECT * 
+        FROM answer_tbl
+        WHERE question_id = ${question_id};  
+    `;
+
+    db.query(query, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows);
+        }
+    });
+
 });
 
 app.listen(port, () => {

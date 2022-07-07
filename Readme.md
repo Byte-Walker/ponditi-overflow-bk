@@ -8,6 +8,6 @@
 - api to get all answers of a specific question : [{}]
 - comment :
 
-- profile api - profile/:user_email
+- (done) profile api - profile/:user_email
 - answers on specific question - answer/:question_id
 - sociallogin
