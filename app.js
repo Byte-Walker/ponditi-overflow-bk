@@ -16,6 +16,24 @@ const db = mysql.createConnection({
 
 db.connect();
 
+// ---------------------------------------- Helper Functions --------------------------------
+const get_user_data = (user_email, delete_pass = true) => {
+    const fetch_user_query = `SELECT * FROM user_tbl 
+    WHERE user_email = '${user_email}';`;
+
+    db.query(fetch_user_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error fetching data: ', err.code);
+            return false;
+        } else {
+            delete_pass && delete rows[0].user_pass;
+            return rows[0];
+        }
+    });
+};
+
+// ---------------------------------------- API routes --------------------------------
+
 // home route
 app.get('/', (req, res) => {
     res.send('Server is running at port ' + port);
@@ -59,12 +77,33 @@ app.post('/signup', (req, res) => {
                     console.log(
                         'inserted user data into user_tbl after creating user_tbl'
                     );
-                    res.send(true);
+                    const fetch_user_query = `SELECT * FROM user_tbl 
+    WHERE user_email = '${user.user_email}';`;
+
+                    db.query(fetch_user_query, (err, rows, fields) => {
+                        if (err) {
+                            console.log('Error fetching data: ', err.code);
+                            res.send(false);
+                        } else {
+                            delete rows[0].user_pass;
+                            res.send(rows[0]);
+                        }
+                    });
                 }
             });
         } else {
-            console.log('Inserted user data into user_tbl');
-            res.send(true);
+            const fetch_user_query = `SELECT * FROM user_tbl 
+    WHERE user_email = '${user.user_email}';`;
+
+            db.query(fetch_user_query, (err, rows, fields) => {
+                if (err) {
+                    console.log('Error fetching data: ', err.code);
+                    res.send(false);
+                } else {
+                    delete rows[0].user_pass;
+                    res.send(rows[0]);
+                }
+            });
         }
     });
 });
@@ -73,23 +112,81 @@ app.post('/signup', (req, res) => {
 app.post('/login', (req, res) => {
     const requestedUser = req.body;
 
-    let user;
-    const fetch_user = `SELECT * FROM user_tbl 
+    let fetched_user;
+    const fetch_user_query = `SELECT * FROM user_tbl 
     WHERE user_email = '${requestedUser.user_email}';`;
-    db.query(fetch_user, (err, rows, fields) => {
+
+    db.query(fetch_user_query, (err, rows, fields) => {
         if (err) {
-            console.log('Error from /login: ', err);
+            console.log('Error fetching data: ', err.code);
+            res.send(false);
         } else {
-            user = rows[0];
-            if (requestedUser.user_pass === user?.user_pass) {
-                delete user.user_pass;
-                res.json(user);
-            } else {
-                res.send(false);
-            }
+            fetched_user = rows[0];
         }
     });
+
+    if (requestedUser.user_pass === fetched_user.user_pass) {
+        delete fetched_user.user_pass;
+        res.send(fetched_user);
+    } else {
+        res.send(false);
+    }
+
+    // let user;
+    // const fetch_user = `SELECT * FROM user_tbl
+    // WHERE user_email = '${requestedUser.user_email}';`;
+    // db.query(fetch_user, (err, rows, fields) => {
+    //     if (err) {
+    //         console.log('Error from /login: ', err);
+    //     } else {
+    //         user = rows[0];
+    //         if (requestedUser.user_pass === user?.user_pass) {
+    //             delete user.user_pass;
+    //             res.json(user);
+    //         } else {
+    //             res.send(false);
+    //         }
+    //     }
+    // });
 });
+
+app.get('/sociallogin', (req, res) => {
+    // const {user_email, user_name, img_url} = req.body;
+    const user_email = 'mdshahidulridoy@gmail.co';
+    const fetch_user_query = `SELECT * FROM user_tbl 
+    WHERE user_email = '${user_email}';`;
+
+    db.query(fetch_user_query, (err, rows, fields) => {
+        if (err?.code) {
+            console.log('Error fetching data: ', err.code);
+            res.send(false);
+            
+        } else {
+            delete rows[0]?.user_pass;
+            res.send(rows.length);
+        }
+    });
+    
+});
+
+app.get('/profile/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
+    
+    const fetch_user_query = `SELECT * FROM user_tbl 
+    WHERE user_email = '${user_email}';`;
+
+    db.query(fetch_user_query, (err, rows, fields) => {
+        if (err?.code) {
+            console.log('Error fetching data: ', err.code);
+            res.send(false);
+            
+        } else {
+            delete rows[0]?.user_pass;
+            res.send(rows[0]);
+        }
+    });
+})
+
 
 // Update profile
 app.post('/updateprofile', (req, res) => {
@@ -119,6 +216,8 @@ app.post('/updateprofile', (req, res) => {
         }
     });
 });
+
+
 
 // Question route
 app.post('/createquestion', (req, res) => {
@@ -273,7 +372,7 @@ app.get('/getuseranswers/:user_email', (req, res) => {
         } else {
             rows.forEach((row) => {
                 delete row.user_pass;
-            })
+            });
             res.send(rows);
         }
     });
