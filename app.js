@@ -131,7 +131,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/sociallogin', (req, res) => {
-    const {user_email, user_name, img_url} = req.body;
+    const { user_email, user_name, img_url } = req.body;
     // const user_email = 'mdshahidulridoy@gmail.co';
     // const user_name = 'Md Shahidul Islam';
     // const img_url = '';
@@ -584,7 +584,51 @@ app.get('/followings/:user_email', (req, res) => {
 
 // ---------------------------------- Upvote table --------------------------------
 
+// write following table
+app.get('/createupvote', (req, res) => {
+    // const { answer_id, user_email } = req.body;
 
+    const answer_id = 11111111;
+    const user_email = 'mdshahidulridoy@gmail.com';
+    
+
+    const create_upvote_tbl = `CREATE TABLE upvote_tbl(
+        answer_id varchar(100) NOT NULL ,
+        user_email varchar(100) NOT NULL
+        );`;
+
+    const insert_upvote_tbl = `INSERT INTO upvote_tbl(answer_id, user_email)
+        VALUES ('${answer_id}', '${user_email}')`;
+
+    db.query(insert_upvote_tbl, (err, rows, fields) => {
+        if (err?.errno === 1146) {
+            // Creating upvote_tbl if it doesn't exist
+            console.log(err.code);
+            db.query(create_upvote_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                }
+                console.log('upvote_tbl created successfully!');
+            });
+
+            // Insertig upvote data into upvote_tbl
+            db.query(insert_upvote_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                } else {
+                    console.log(
+                        'inserted upvote data into upvote_tbl after creating upvote_tbl'
+                    );
+                    res.send(true);
+                }
+            });
+        } else {
+            res.send(true);
+        }
+    });
+});
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
