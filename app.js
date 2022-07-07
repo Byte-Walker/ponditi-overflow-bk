@@ -638,7 +638,7 @@ app.get('/upvoters/:answer_id', (req, res) => {
     SELECT user_email, user_name, img_url
     FROM upvote_tbl
     NATURAL JOIN user_tbl
-    WHERE answer_id = ${answer_id};
+    WHERE answer_id = '${answer_id}';
     `;
 
     db.query(get_upvoters_query, (err, rows, fields) => {
@@ -733,6 +733,7 @@ app.get('/notifications/:user_email', (req, res) => {
         }
     });
 });
+
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
