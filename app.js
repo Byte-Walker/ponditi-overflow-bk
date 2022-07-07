@@ -711,6 +711,29 @@ app.post('/createnotification', (req, res) => {
     });
 });
 
+// Get all the notifications
+app.get('/notifications/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
+
+    const get_notifications_query = `
+    SELECT *
+    FROM notification_tbl
+    WHERE user_email = '${user_email}';
+    `;
+
+    db.query(get_notifications_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from getting notifications query: ', err);
+        } else {
+            if (rows.length === 0) {
+                res.send({});
+            } else {
+                res.send(rows);
+            }
+        }
+    });
+});
+
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
 });
