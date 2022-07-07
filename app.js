@@ -545,7 +545,10 @@ app.get('/followers/:user_email', (req, res) => {
                 res.send({});
             } else {
                 const followers = {};
-
+                rows.forEach((row) => {
+                    followers[row.follower] = true;
+                })
+                res.send(followers);
             }
         }
     });
