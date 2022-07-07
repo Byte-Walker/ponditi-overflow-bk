@@ -585,11 +585,12 @@ app.get('/followings/:user_email', (req, res) => {
 // ---------------------------------- Upvote table --------------------------------
 
 // write following table
-app.post('/createupvote', (req, res) => {
-    const { answer_id, user_email } = req.body;
+app.get('/createupvote', (req, res) => {
+    const { answer_id, user_email, mode } = req.body;
 
     // const answer_id = 11111111;
     // const user_email = 'mdshahidulridoy@gmail.com';
+    // const mode = 'delete';
 
     const create_upvote_tbl = `CREATE TABLE upvote_tbl(
         answer_id varchar(100) NOT NULL ,
@@ -599,34 +600,50 @@ app.post('/createupvote', (req, res) => {
     const insert_upvote_tbl = `INSERT INTO upvote_tbl(answer_id, user_email)
         VALUES ('${answer_id}', '${user_email}')`;
 
-    db.query(insert_upvote_tbl, (err, rows, fields) => {
-        if (err?.errno === 1146) {
-            // Creating upvote_tbl if it doesn't exist
-            console.log(err.code);
-            db.query(create_upvote_tbl, (err, rows, fields) => {
-                if (err) {
-                    console.error(err.code);
-                    res.send(false);
-                }
-                console.log('upvote_tbl created successfully!');
-            });
+    const delete_upvote_tbl = `
+        DELETE FROM upvote_tbl
+        WHERE user_email = '${user_email}' and answer_id = '${answer_id}'
+    `;
 
-            // Insertig upvote data into upvote_tbl
-            db.query(insert_upvote_tbl, (err, rows, fields) => {
-                if (err) {
-                    console.error(err.code);
-                    res.send(false);
-                } else {
-                    console.log(
-                        'inserted upvote data into upvote_tbl after creating upvote_tbl'
-                    );
-                    res.send(true);
-                }
-            });
-        } else {
-            res.send(true);
-        }
-    });
+    if (mode === 'add') {
+        db.query(insert_upvote_tbl, (err, rows, fields) => {
+            if (err?.errno === 1146) {
+                // Creating upvote_tbl if it doesn't exist
+                console.log(err.code);
+                db.query(create_upvote_tbl, (err, rows, fields) => {
+                    if (err) {
+                        console.error(err.code);
+                        res.send(false);
+                    }
+                    console.log('upvote_tbl created successfully!');
+                });
+
+                // Insertig upvote data into upvote_tbl
+                db.query(insert_upvote_tbl, (err, rows, fields) => {
+                    if (err) {
+                        console.error(err.code);
+                        res.send(false);
+                    } else {
+                        console.log(
+                            'inserted upvote data into upvote_tbl after creating upvote_tbl'
+                        );
+                        res.send(true);
+                    }
+                });
+            } else {
+                res.send(true);
+            }
+        });
+    } else if(mode === 'delete') {
+        db.query(delete_upvote_tbl, (err, rows, fields) => {
+            if(err) {
+                console.log('From delete upvote: ' + err.code);
+                res.send(false);
+            } else {
+                res.send(true);
+            }
+        })
+    }
 });
 
 // get all people who upvoted on an answer
@@ -664,7 +681,8 @@ app.get('/upvoters/:answer_id', (req, res) => {
 // ---------------------------------- Notifications table --------------------------------
 // write notification table
 app.post('/createnotification', (req, res) => {
-    const { notification_title, user_email, notification_description } = req.body;
+    const { notification_title, user_email, notification_description } =
+        req.body;
 
     // const notification_title = 'Test';
     // const notification_description = 'First test';
@@ -734,8 +752,6 @@ app.get('/notifications/:user_email', (req, res) => {
     });
 });
 
-
-
 // ---------------------------------- share table --------------------------------
 
 // write share table
@@ -790,7 +806,7 @@ app.post('/createshare', (req, res) => {
 //     const user_email = req.params.user_email;
 
 //     const get_shares_query = `
-//     SELECT  
+//     SELECT
 //     FROM share_tbl s, question_tbl q, answer_tbl a, user_tbl u
 //     WHERE share_tbl.user_email = '${user_email}' and share_tbl.answer_id = answer_tbl.answer_id and answer_tbl.question_id = question_tbl.question_id;
 //     `;
@@ -811,7 +827,6 @@ app.post('/createshare', (req, res) => {
 //         }
 //     });
 // });
-
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
