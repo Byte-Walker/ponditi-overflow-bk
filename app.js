@@ -130,11 +130,11 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.get('/sociallogin', (req, res) => {
-    // const {user_email, user_name, img_url} = req.body;
-    const user_email = 'mdshahidulridoy@gmail.co';
-    const user_name = 'Md Shahidul Islam';
-    const img_url = '';
+app.post('/sociallogin', (req, res) => {
+    const {user_email, user_name, img_url} = req.body;
+    // const user_email = 'mdshahidulridoy@gmail.co';
+    // const user_name = 'Md Shahidul Islam';
+    // const img_url = '';
 
     // queries
     const fetch_user_query = `SELECT * FROM user_tbl 
@@ -482,6 +482,8 @@ app.get('/question/:question_id', (req, res) => {
     });
 });
 
+// ---------------------------------- Following table --------------------------------
+
 // write following table
 app.post('/createfollower', (req, res) => {
     const { followed, follower } = req.body;
@@ -547,7 +549,7 @@ app.get('/followers/:user_email', (req, res) => {
                 const followers = {};
                 rows.forEach((row) => {
                     followers[row.follower] = true;
-                })
+                });
                 res.send(followers);
             }
         }
@@ -573,12 +575,16 @@ app.get('/followings/:user_email', (req, res) => {
                 const followings = {};
                 rows.forEach((row) => {
                     followings[row.followed] = true;
-                })
+                });
                 res.send(followings);
             }
         }
     });
 });
+
+// ---------------------------------- Upvote table --------------------------------
+
+
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
