@@ -153,7 +153,6 @@ app.get('/sociallogin', (req, res) => {
     const insert_user_tbl = `INSERT INTO user_tbl(user_email, user_name, img_url)
                     VALUES ('${user_email}', '${user_name}', '${img_url}');`;
 
-    
     db.query(fetch_user_query, (err, rows, fields) => {
         if (err?.code) {
             console.log('Error fetching data: ', err.code);
@@ -161,7 +160,6 @@ app.get('/sociallogin', (req, res) => {
         } else {
             const str = JSON.stringify(rows);
             if (str === '[]') {
-                
                 db.query(insert_user_tbl, (err, rows, fields) => {
                     if (err?.errno === 1146) {
                         // Creating user_tbl if it doesn't exist
@@ -449,6 +447,7 @@ app.get('/answers/:question_id', (req, res) => {
     const query = `
         SELECT * 
         FROM answer_tbl
+        NATURAL JOIN user_tbl
         WHERE question_id = ${question_id};  
     `;
 
@@ -456,12 +455,15 @@ app.get('/answers/:question_id', (req, res) => {
         if (err) {
             console.error(err.code);
         } else {
+            rows.forEach((row) => {
+                delete row.user_pass;
+            });
             res.send(rows);
         }
     });
 });
 
-// get the info about a question 
+// get the info about a question
 app.get('/question/:question_id', (req, res) => {
     const question_id = req.params.question_id;
 
@@ -476,6 +478,75 @@ app.get('/question/:question_id', (req, res) => {
             console.error(err.code);
         } else {
             res.send(rows[0]);
+        }
+    });
+});
+
+// write following table
+app.post('/createfollower', (req, res) => {
+    const { followed, follower } = req.body;
+
+    // const followed = 'shahid';
+    // const follower = 'faisal';
+
+    const create_following_tbl = `CREATE TABLE following_tbl(
+        followed varchar(100) NOT NULL ,
+        follower varchar(100) NOT NULL
+        );`;
+
+    const insert_following_tbl = `INSERT INTO following_tbl(followed, follower)
+        VALUES ('${followed}', '${follower}')`;
+
+    db.query(insert_following_tbl, (err, rows, fields) => {
+        if (err?.errno === 1146) {
+            // Creating following_tbl if it doesn't exist
+            console.log(err.code);
+            db.query(create_following_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                }
+                console.log('following_tbl created successfully!');
+            });
+
+            // Insertig following data into following_tbl
+            db.query(insert_following_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                } else {
+                    console.log(
+                        'inserted following data into following_tbl after creating following_tbl'
+                    );
+
+                    res.send(true);
+                }
+            });
+        } else {
+            res.send(true);
+        }
+    });
+});
+
+// get followers api from following_tbl
+app.get('/followers/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
+    const get_followers_query = `
+    SELECT follower
+    FROM following_tbl
+    WHERE followed = '${user_email}';
+    `;
+
+    db.query(get_followers_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from getting followers query: ', err);
+        } else {
+            if (rows.length === 0) {
+                res.send({});
+            } else {
+                const followers = {};
+
+            }
         }
     });
 });
