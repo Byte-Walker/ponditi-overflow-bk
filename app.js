@@ -286,7 +286,7 @@ app.post('/createquestion', (req, res) => {
     const insert_question_tbl = `INSERT INTO question_tbl(question_id, question_description, user_email, time)
   VALUES ('${Date.now()}', '${questionInfo.question_description}', '${
         questionInfo.user_email
-    }', '${new Date().toLocaleTimeString()}')`;
+    }', '${new Date().toLocaleString()}')`;
 
     db.query(insert_question_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -340,7 +340,7 @@ app.post('/createanswer', (req, res) => {
     const insert_answer_tbl = `INSERT INTO answer_tbl(answer_id, question_id, answer_description, user_email, time)
 VALUES ('${Date.now()}', '${answerInfo.question_id}', '${
         answerInfo.answer_description
-    }', '${answerInfo.user_email}', '${new Date().toLocaleTimeString()}')`;
+    }', '${answerInfo.user_email}', '${new Date().toLocaleString()}')`;
 
     db.query(insert_answer_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -634,7 +634,7 @@ app.post('/createupvote', (req, res) => {
 
 app.get('/upvoters/:answer_id', (req, res) => {
     const answer_id = req.params.answer_id;
-    
+
     const get_upvoters_query = `
     SELECT user_email, user_name, img_url
     FROM upvote_tbl
@@ -651,6 +651,57 @@ app.get('/upvoters/:answer_id', (req, res) => {
             } else {
                 res.send(rows);
             }
+        }
+    });
+});
+
+// ---------------------------------- Notifications table --------------------------------
+// write notification table
+app.post('/createnotification', (req, res) => {
+    const { title, user_email, description } = req.body;
+    
+    // const title = 'Test'; 
+    // const description = 'First test';
+    // const user_email = 'mdshahidulridoy@gmail.com';
+    
+
+    const create_notification_tbl = `CREATE TABLE notification_tbl(
+        notification_id varchar(100) NOT NULL ,
+        user_email varchar(100) NOT NULL,
+        title varchar(100) NOT NULL,
+        description varchar(300) NOT NULL,
+        time varchar(300)
+        );`;
+
+    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, title, description, time)
+        VALUES ('${Date.now()}', '${user_email}', '${title}' ,'${description}', '${new Date().toLocaleString()}')`;
+
+    db.query(insert_notification_tbl, (err, rows, fields) => {
+        if (err?.errno === 1146) {
+            // Creating notification_tbl if it doesn't exist
+            console.log(err.code);
+            db.query(create_notification_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                }
+                console.log('notification_tbl created successfully!');
+            });
+
+            // Insertig notification data into notification_tbl
+            db.query(insert_notification_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                } else {
+                    console.log(
+                        'inserted notification data into notification_tbl after creating notification_tbl'
+                    );
+                    res.send(true);
+                }
+            });
+        } else {
+            res.send(true);
         }
     });
 });
