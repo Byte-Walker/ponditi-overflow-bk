@@ -112,26 +112,6 @@ app.post('/signup', (req, res) => {
 app.post('/login', (req, res) => {
     const requestedUser = req.body;
 
-    // let fetched_user;
-    // const fetch_user_query = `SELECT * FROM user_tbl 
-    // WHERE user_email = '${requestedUser.user_email}';`;
-
-    // db.query(fetch_user_query, (err, rows, fields) => {
-    //     if (err) {
-    //         console.log('Error fetching data: ', err.code);
-    //         res.send(false);
-    //     } else {
-    //         fetched_user = rows[0];
-    //     }
-    // });
-
-    // if (requestedUser?.user_pass === fetched_user?.user_pass) {
-    //     delete fetched_user.user_pass;
-    //     res.send(fetched_user);
-    // } else {
-    //     res.send(false);
-    // }
-
     let user;
     const fetch_user = `SELECT * FROM user_tbl
     WHERE user_email = '${requestedUser.user_email}';`;
@@ -153,16 +133,92 @@ app.post('/login', (req, res) => {
 app.get('/sociallogin', (req, res) => {
     // const {user_email, user_name, img_url} = req.body;
     const user_email = 'mdshahidulridoy@gmail.co';
+    const user_name = 'Md Shahidul Islam';
+    const img_url = '';
+
+    // queries
     const fetch_user_query = `SELECT * FROM user_tbl 
     WHERE user_email = '${user_email}';`;
 
+    const create_user_tbl = `CREATE TABLE user_tbl(
+                    user_email varchar(100) PRIMARY KEY NOT NULL ,
+                    user_pass varchar(100),
+                    user_name varchar(50),
+                    img_url varchar(1000),
+                    job varchar(50),
+                    study varchar(50),
+                    location varchar(50)
+                    );`;
+
+    const insert_user_tbl = `INSERT INTO user_tbl(user_email, user_name, img_url)
+                    VALUES ('${user_email}', '${user_name}', '${img_url}');`;
+
+    
     db.query(fetch_user_query, (err, rows, fields) => {
         if (err?.code) {
             console.log('Error fetching data: ', err.code);
             res.send(false);
         } else {
-            delete rows[0]?.user_pass;
-            res.send(rows.length);
+            const str = JSON.stringify(rows);
+            if (str === '[]') {
+                
+                db.query(insert_user_tbl, (err, rows, fields) => {
+                    if (err?.errno === 1146) {
+                        // Creating user_tbl if it doesn't exist
+                        console.log(err.code);
+                        db.query(create_user_tbl, (err, rows, fields) => {
+                            if (err) {
+                                console.error(err.code);
+                                res.send(false);
+                            }
+                            console.log('user_tbl created successfully!');
+                        });
+
+                        // Insertig user data into user_tbl
+                        db.query(insert_user_tbl, (err, rows, fields) => {
+                            if (err) {
+                                console.error(err.code);
+                                res.send(false);
+                            } else {
+                                console.log(
+                                    'inserted user data into user_tbl after creating user_tbl'
+                                );
+                                const fetch_user_query = `SELECT * FROM user_tbl 
+                                    WHERE user_email = '${user_email}';`;
+
+                                db.query(
+                                    fetch_user_query,
+                                    (err, rows, fields) => {
+                                        if (err) {
+                                            console.log(
+                                                'Error fetching data: ',
+                                                err.code
+                                            );
+                                            res.send(false);
+                                        } else {
+                                            delete rows[0].user_pass;
+                                            res.send(rows[0]);
+                                        }
+                                    }
+                                );
+                            }
+                        });
+                    } else {
+                        db.query(fetch_user_query, (err, rows, fields) => {
+                            if (err) {
+                                console.log('Error fetching data: ', err.code);
+                                res.send(false);
+                            } else {
+                                delete rows[0].user_pass;
+                                res.send(rows[0]);
+                            }
+                        });
+                    }
+                });
+            } else {
+                delete rows[0].user_pass;
+                res.send(rows[0]);
+            }
         }
     });
 });
@@ -403,7 +459,6 @@ app.get('/answers/:question_id', (req, res) => {
             res.send(rows);
         }
     });
-
 });
 
 app.listen(port, () => {

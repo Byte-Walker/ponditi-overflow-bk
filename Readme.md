@@ -9,5 +9,5 @@
 - comment :
 
 - (done) profile api - profile/:user_email
-- answers on specific question - answer/:question_id
+- (done) answers on specific question - answer/:question_id
 - sociallogin
