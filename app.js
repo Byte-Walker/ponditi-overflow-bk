@@ -554,6 +554,32 @@ app.get('/followers/:user_email', (req, res) => {
     });
 });
 
+// get followings api from following_tbl
+app.get('/followings/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
+    const get_followings_query = `
+    SELECT followed
+    FROM following_tbl
+    WHERE follower = '${user_email}';
+    `;
+
+    db.query(get_followings_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from getting followings query: ', err);
+        } else {
+            if (rows.length === 0) {
+                res.send({});
+            } else {
+                const followings = {};
+                rows.forEach((row) => {
+                    followings[row.followed] = true;
+                })
+                res.send(followings);
+            }
+        }
+    });
+});
+
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
 });
