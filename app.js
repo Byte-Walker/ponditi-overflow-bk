@@ -664,22 +664,22 @@ app.get('/upvoters/:answer_id', (req, res) => {
 // ---------------------------------- Notifications table --------------------------------
 // write notification table
 app.post('/createnotification', (req, res) => {
-    const { title, user_email, description } = req.body;
+    const { notification_title, user_email, notification_description } = req.body;
 
-    // const title = 'Test';
-    // const description = 'First test';
+    // const notification_title = 'Test';
+    // const notification_description = 'First test';
     // const user_email = 'mdshahidulridoy@gmail.com';
 
     const create_notification_tbl = `CREATE TABLE notification_tbl(
         notification_id varchar(100) NOT NULL ,
         user_email varchar(100) NOT NULL,
-        title varchar(100) NOT NULL,
-        description varchar(300) NOT NULL,
+        notification_title varchar(100) NOT NULL,
+        notification_description varchar(300) NOT NULL,
         time varchar(300)
         );`;
 
-    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, title, description, time)
-        VALUES ('${Date.now()}', '${user_email}', '${title}' ,'${description}', '${new Date().toLocaleString()}')`;
+    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, notification_title, notification_description, time)
+        VALUES ('${Date.now()}', '${user_email}', '${notification_title}' ,'${notification_description}', '${new Date().toLocaleString()}')`;
 
     db.query(insert_notification_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -733,6 +733,84 @@ app.get('/notifications/:user_email', (req, res) => {
         }
     });
 });
+
+
+
+// ---------------------------------- share table --------------------------------
+
+// write share table
+app.post('/createshare', (req, res) => {
+    // const { user_email, answer_id } = req.body;
+
+    const user_email = 'mdshahidulridoy@gmail.com';
+    const answer_id = `1656879810929`;
+
+    const create_share_tbl = `CREATE TABLE share_tbl(
+        user_email varchar(100) NOT NULL ,
+        answer_id varchar(100) NOT NULL, 
+        time varchar(100)
+        );`;
+
+    const insert_share_tbl = `INSERT INTO share_tbl(user_email, answer_id, time)
+        VALUES ('${user_email}', '${answer_id}', '${new Date().toLocaleString()}')`;
+
+    db.query(insert_share_tbl, (err, rows, fields) => {
+        if (err?.errno === 1146) {
+            // Creating share_tbl if it doesn't exist
+            console.log(err.code);
+            db.query(create_share_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                }
+                console.log('share_tbl created successfully!');
+            });
+
+            // Insertig share data into share_tbl
+            db.query(insert_share_tbl, (err, rows, fields) => {
+                if (err) {
+                    console.error(err.code);
+                    res.send(false);
+                } else {
+                    console.log(
+                        'inserted share data into share_tbl after creating share_tbl'
+                    );
+
+                    res.send(true);
+                }
+            });
+        } else {
+            res.send(true);
+        }
+    });
+});
+
+// get shares api from following_tbl
+// app.get('/shares/:user_email', (req, res) => {
+//     const user_email = req.params.user_email;
+
+//     const get_shares_query = `
+//     SELECT  
+//     FROM share_tbl s, question_tbl q, answer_tbl a, user_tbl u
+//     WHERE share_tbl.user_email = '${user_email}' and share_tbl.answer_id = answer_tbl.answer_id and answer_tbl.question_id = question_tbl.question_id;
+//     `;
+
+//     db.query(get_shares_query, (err, rows, fields) => {
+//         if (err) {
+//             console.log('Error from getting shares query: ', err);
+//         } else {
+//             if (rows.length === 0) {
+//                 res.send({});
+//             } else {
+//                 const shares = {};
+//                 rows.forEach((row) => {
+//                     shares[row.follower] = true;
+//                 });
+//                 res.send(shares);
+//             }
+//         }
+//     });
+// });
 
 
 app.listen(port, () => {
