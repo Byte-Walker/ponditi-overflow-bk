@@ -590,7 +590,6 @@ app.post('/createupvote', (req, res) => {
 
     // const answer_id = 11111111;
     // const user_email = 'mdshahidulridoy@gmail.com';
-    
 
     const create_upvote_tbl = `CREATE TABLE upvote_tbl(
         answer_id varchar(100) NOT NULL ,
@@ -649,7 +648,14 @@ app.get('/upvoters/:answer_id', (req, res) => {
             if (rows.length === 0) {
                 res.send({});
             } else {
-                res.send(rows);
+                const upvoters = {};
+                rows.forEach((row) => {
+                    upvoters[row.user_email] = {
+                        user_name: row.user_name,
+                        img_url: row.img_url,
+                    };
+                });
+                res.send(upvoters);
             }
         }
     });
@@ -659,11 +665,10 @@ app.get('/upvoters/:answer_id', (req, res) => {
 // write notification table
 app.post('/createnotification', (req, res) => {
     const { title, user_email, description } = req.body;
-    
-    // const title = 'Test'; 
+
+    // const title = 'Test';
     // const description = 'First test';
     // const user_email = 'mdshahidulridoy@gmail.com';
-    
 
     const create_notification_tbl = `CREATE TABLE notification_tbl(
         notification_id varchar(100) NOT NULL ,
