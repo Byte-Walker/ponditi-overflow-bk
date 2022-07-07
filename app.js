@@ -585,11 +585,11 @@ app.get('/followings/:user_email', (req, res) => {
 // ---------------------------------- Upvote table --------------------------------
 
 // write following table
-app.get('/createupvote', (req, res) => {
-    // const { answer_id, user_email } = req.body;
+app.post('/createupvote', (req, res) => {
+    const { answer_id, user_email } = req.body;
 
-    const answer_id = 11111111;
-    const user_email = 'mdshahidulridoy@gmail.com';
+    // const answer_id = 11111111;
+    // const user_email = 'mdshahidulridoy@gmail.com';
     
 
     const create_upvote_tbl = `CREATE TABLE upvote_tbl(
@@ -626,6 +626,31 @@ app.get('/createupvote', (req, res) => {
             });
         } else {
             res.send(true);
+        }
+    });
+});
+
+// get all people who upvoted on an answer
+
+app.get('/upvoters/:answer_id', (req, res) => {
+    const answer_id = req.params.answer_id;
+    
+    const get_upvoters_query = `
+    SELECT user_email, user_name, img_url
+    FROM upvote_tbl
+    NATURAL JOIN user_tbl
+    WHERE answer_id = ${answer_id};
+    `;
+
+    db.query(get_upvoters_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from getting upvoters query: ', err);
+        } else {
+            if (rows.length === 0) {
+                res.send({});
+            } else {
+                res.send(rows);
+            }
         }
     });
 });
