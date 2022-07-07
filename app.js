@@ -461,6 +461,25 @@ app.get('/answers/:question_id', (req, res) => {
     });
 });
 
+// get the info about a question 
+app.get('/question/:question_id', (req, res) => {
+    const question_id = req.params.question_id;
+
+    const query = `
+        SELECT * 
+        FROM question_tbl
+        WHERE question_id = ${question_id};  
+    `;
+
+    db.query(query, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows[0]);
+        }
+    });
+});
+
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
 });
