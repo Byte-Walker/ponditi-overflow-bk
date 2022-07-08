@@ -634,15 +634,15 @@ app.post('/createupvote', (req, res) => {
                 res.send(true);
             }
         });
-    } else if(mode === 'delete') {
+    } else if (mode === 'delete') {
         db.query(delete_upvote_tbl, (err, rows, fields) => {
-            if(err) {
+            if (err) {
                 console.log('From delete upvote: ' + err.code);
                 res.send(false);
             } else {
                 res.send(true);
             }
-        })
+        });
     }
 });
 
@@ -802,34 +802,29 @@ app.post('/createshare', (req, res) => {
 });
 
 // get shares api from following_tbl
-// app.get('/shares/:user_email', (req, res) => {
-//     const user_email = req.params.user_email;
+app.get('/shares/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
 
-//     const get_shares_query = `
-//     SELECT
-//     FROM share_tbl s, question_tbl q, answer_tbl a, user_tbl u
-//     WHERE share_tbl.user_email = '${user_email}' and share_tbl.answer_id = answer_tbl.answer_id and answer_tbl.question_id = question_tbl.question_id;
-//     `;
+    const get_shares_query = `
+        SELECT answer_tbl.question_id, question_tbl.question_description, answer_tbl.answer_id, answer_tbl.answer_description, answer_tbl.user_email, user_tbl.user_name, user_tbl.img_url
+        FROM share_tbl, answer_tbl, question_tbl, user_tbl
+        WHERE share_tbl.user_email = '${user_email}' and share_tbl.answer_id = answer_tbl.answer_id and answer_tbl.question_id = question_tbl.question_id and answer_tbl.user_email = user_tbl.user_email
+    `;
 
-//     db.query(get_shares_query, (err, rows, fields) => {
-//         if (err) {
-//             console.log('Error from getting shares query: ', err);
-//         } else {
-//             if (rows.length === 0) {
-//                 res.send({});
-//             } else {
-//                 const shares = {};
-//                 rows.forEach((row) => {
-//                     shares[row.follower] = true;
-//                 });
-//                 res.send(shares);
-//             }
-//         }
-//     });
-// });
+    db.query(get_shares_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from getting shares query: ', err);
+        } else {
+            if (rows.length === 0) {
+                res.send({});
+            } else {
+                res.send(rows);
+            }
+        }
+    });
+});
 
 // ------------------------------------------------ tag table -----------------------------------
-
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
