@@ -731,8 +731,13 @@ app.get('/upvoters/:answer_id', (req, res) => {
 // ---------------------------------- Notifications table --------------------------------
 // write notification table
 app.post('/createnotification', (req, res) => {
-    const { notification_title, user_email, notification_description } =
-        req.body;
+    const {
+        notification_title,
+        user_email,
+        notification_description,
+        answer_id,
+        type,
+    } = req.body;
     const d = new Date();
     const dateTime = `${
         months[d.getMonth()]
@@ -747,11 +752,13 @@ app.post('/createnotification', (req, res) => {
         user_email varchar(100) NOT NULL,
         notification_title varchar(100) NOT NULL,
         notification_description varchar(300) NOT NULL,
+        answer_id varchar(100) NOT NULL,
+        type varchar(100),
         time varchar(300)
         );`;
 
-    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, notification_title, notification_description, time)
-        VALUES ('${Date.now()}', '${user_email}', '${notification_title}' ,'${notification_description}', '${dateTime}')`;
+    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, notification_title, notification_description, answer_id, type, time)
+        VALUES ('${Date.now()}', '${user_email}', '${notification_title}' ,'${notification_description}', ${answer_id}, ${type}, '${dateTime}')`;
 
     db.query(insert_notification_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -877,6 +884,34 @@ app.get('/shares/:user_email', (req, res) => {
                 res.send({});
             } else {
                 res.send(rows);
+            }
+        }
+    });
+});
+
+// get all the shares of an answer
+
+app.get('/sharers/:answer_id', (req, res) => {
+    const answer_id = req.params.answer_id;
+
+    const get_shares_query = `
+    SELECT user_email
+    FROM share_tbl
+    WHERE answer_id = '${answer_id}';
+    `;
+
+    db.query(get_shares_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from getting shares query: ', err);
+        } else {
+            if (rows.length === 0) {
+                res.send({});
+            } else {
+                const shares = {};
+                rows.forEach((row) => {
+                    shares[row.user_email] = true;
+                });
+                res.send(shares);
             }
         }
     });
