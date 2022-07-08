@@ -39,6 +39,8 @@ app.get('/', (req, res) => {
     res.send('Server is running at port ' + port);
 });
 
+// ---------------------------------------- Authentication --------------------------------
+
 // Signup route
 app.post('/signup', (req, res) => {
     const user = req.body;
@@ -221,6 +223,8 @@ app.post('/sociallogin', (req, res) => {
     });
 });
 
+// ---------------------------------------- User table --------------------------------
+
 app.get('/profile/:user_email', (req, res) => {
     const user_email = req.params.user_email;
 
@@ -266,6 +270,8 @@ app.post('/updateprofile', (req, res) => {
         }
     });
 });
+
+// ---------------------------------------- Question table --------------------------------
 
 // Question route
 app.post('/createquestion', (req, res) => {
@@ -319,6 +325,61 @@ app.post('/createquestion', (req, res) => {
     });
 });
 
+// Get user specific questions
+app.get('/getuserquestions/:user_email', (req, res) => {
+    const user_email = req.params.user_email;
+
+    // const user_email = 'mdshahidulridoy@gmail.com';
+
+    const get_user_questions = `SELECT question_id, question_description, time
+    FROM question_tbl
+    NATURAL JOIN user_tbl
+    WHERE user_email = '${user_email}'`;
+
+    db.query(get_user_questions, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
+// Get all questions
+app.get('/getallquestions', (req, res) => {
+    const get_all_questions = `SELECT user_email, question_id, question_description, user_name, time
+    FROM question_tbl
+    NATURAL JOIN user_tbl`;
+    db.query(get_all_questions, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
+// get the info about a question
+app.get('/question/:question_id', (req, res) => {
+    const question_id = req.params.question_id;
+
+    const query = `
+        SELECT * 
+        FROM question_tbl
+        WHERE question_id = ${question_id};  
+    `;
+
+    db.query(query, (err, rows, fields) => {
+        if (err) {
+            console.error(err.code);
+        } else {
+            res.send(rows[0]);
+        }
+    });
+});
+
+// ---------------------------------------- Answers table --------------------------------
+
 // Answer route
 app.post('/createanswer', (req, res) => {
     const answerInfo = req.body;
@@ -369,40 +430,6 @@ VALUES ('${Date.now()}', '${answerInfo.question_id}', '${
         } else {
             console.log('Inserted answer data into answer_tbl');
             res.send(true);
-        }
-    });
-});
-
-// Get user specific questions
-app.get('/getuserquestions/:user_email', (req, res) => {
-    const user_email = req.params.user_email;
-
-    // const user_email = 'mdshahidulridoy@gmail.com';
-
-    const get_user_questions = `SELECT question_id, question_description, time
-    FROM question_tbl
-    NATURAL JOIN user_tbl
-    WHERE user_email = '${user_email}'`;
-
-    db.query(get_user_questions, (err, rows, fields) => {
-        if (err) {
-            console.error(err.code);
-        } else {
-            res.send(rows);
-        }
-    });
-});
-
-// Get all questions
-app.get('/getallquestions', (req, res) => {
-    const get_all_questions = `SELECT user_email, question_id, question_description, user_name, time
-    FROM question_tbl
-    NATURAL JOIN user_tbl`;
-    db.query(get_all_questions, (err, rows, fields) => {
-        if (err) {
-            console.error(err.code);
-        } else {
-            res.send(rows);
         }
     });
 });
@@ -463,21 +490,20 @@ app.get('/answers/:question_id', (req, res) => {
     });
 });
 
-// get the info about a question
-app.get('/question/:question_id', (req, res) => {
-    const question_id = req.params.question_id;
+app.delete('/answers/:answer_id', (req, res) => {
+    const answer_id = req.params.answer_id;
 
     const query = `
-        SELECT * 
-        FROM question_tbl
-        WHERE question_id = ${question_id};  
+        DELETE FROM answer_tbl
+        WHERE answer_id = '${answer_id}'
     `;
 
     db.query(query, (err, rows, fields) => {
         if (err) {
-            console.error(err.code);
+            console.error('Error from answer delete: ', err);
+            res.send(false);
         } else {
-            res.send(rows[0]);
+            res.send(true);
         }
     });
 });
@@ -752,7 +778,7 @@ app.get('/notifications/:user_email', (req, res) => {
     });
 });
 
-// ---------------------------------- share table --------------------------------
+// ---------------------------------- Share table --------------------------------
 
 // write share table
 app.post('/createshare', (req, res) => {
@@ -823,8 +849,6 @@ app.get('/shares/:user_email', (req, res) => {
         }
     });
 });
-
-// ------------------------------------------------ tag table -----------------------------------
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
