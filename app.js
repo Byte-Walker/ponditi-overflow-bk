@@ -585,7 +585,7 @@ app.get('/followings/:user_email', (req, res) => {
 // ---------------------------------- Upvote table --------------------------------
 
 // write following table
-app.get('/createupvote', (req, res) => {
+app.post('/createupvote', (req, res) => {
     const { answer_id, user_email, mode } = req.body;
 
     // const answer_id = 11111111;
@@ -827,6 +827,9 @@ app.post('/createshare', (req, res) => {
 //         }
 //     });
 // });
+
+// ------------------------------------------------ tag table -----------------------------------
+
 
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
