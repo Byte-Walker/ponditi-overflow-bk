@@ -16,21 +16,10 @@ const db = mysql.createConnection({
 
 db.connect();
 
-// ---------------------------------------- Helper Functions --------------------------------
-const get_user_data = (user_email, delete_pass = true) => {
-    const fetch_user_query = `SELECT * FROM user_tbl 
-    WHERE user_email = '${user_email}';`;
+// ---------------------------------------- Helpers--------------------------------
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-    db.query(fetch_user_query, (err, rows, fields) => {
-        if (err) {
-            console.log('Error fetching data: ', err.code);
-            return false;
-        } else {
-            delete_pass && delete rows[0].user_pass;
-            return rows[0];
-        }
-    });
-};
+
 
 // ---------------------------------------- API routes --------------------------------
 
@@ -276,6 +265,8 @@ app.post('/updateprofile', (req, res) => {
 // Question route
 app.post('/createquestion', (req, res) => {
     const questionInfo = req.body;
+    const d = new Date();
+    const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     const create_question_tbl = `CREATE TABLE question_tbl(
       question_id varchar(100) PRIMARY KEY NOT NULL,
@@ -292,7 +283,7 @@ app.post('/createquestion', (req, res) => {
     const insert_question_tbl = `INSERT INTO question_tbl(question_id, question_description, user_email, time)
   VALUES ('${Date.now()}', '${questionInfo.question_description}', '${
         questionInfo.user_email
-    }', '${new Date().toLocaleString()}')`;
+    }', '${dateTime}')`;
 
     db.query(insert_question_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -383,6 +374,8 @@ app.get('/question/:question_id', (req, res) => {
 // Answer route
 app.post('/createanswer', (req, res) => {
     const answerInfo = req.body;
+    const d = new Date();
+    const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     const create_answer_tbl = `CREATE TABLE answer_tbl(
       answer_id varchar(100) PRIMARY KEY NOT NULL,
@@ -401,7 +394,7 @@ app.post('/createanswer', (req, res) => {
     const insert_answer_tbl = `INSERT INTO answer_tbl(answer_id, question_id, answer_description, user_email, time)
 VALUES ('${Date.now()}', '${answerInfo.question_id}', '${
         answerInfo.answer_description
-    }', '${answerInfo.user_email}', '${new Date().toLocaleString()}')`;
+    }', '${answerInfo.user_email}', '${dateTime}')`;
 
     db.query(insert_answer_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -709,6 +702,8 @@ app.get('/upvoters/:answer_id', (req, res) => {
 app.post('/createnotification', (req, res) => {
     const { notification_title, user_email, notification_description } =
         req.body;
+        const d = new Date();
+        const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     // const notification_title = 'Test';
     // const notification_description = 'First test';
@@ -723,7 +718,7 @@ app.post('/createnotification', (req, res) => {
         );`;
 
     const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, notification_title, notification_description, time)
-        VALUES ('${Date.now()}', '${user_email}', '${notification_title}' ,'${notification_description}', '${new Date().toLocaleString()}')`;
+        VALUES ('${Date.now()}', '${user_email}', '${notification_title}' ,'${notification_description}', '${dateTime}')`;
 
     db.query(insert_notification_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -782,10 +777,12 @@ app.get('/notifications/:user_email', (req, res) => {
 
 // write share table
 app.post('/createshare', (req, res) => {
-    // const { user_email, answer_id } = req.body;
+    const { user_email, answer_id } = req.body;
+    const d = new Date();
+    const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
-    const user_email = 'mdshahidulridoy@gmail.com';
-    const answer_id = `1656879810929`;
+    // const user_email = 'mdshahidulridoy@gmail.com';
+    // const answer_id = `1656879810929`;
 
     const create_share_tbl = `CREATE TABLE share_tbl(
         user_email varchar(100) NOT NULL ,
@@ -794,7 +791,7 @@ app.post('/createshare', (req, res) => {
         );`;
 
     const insert_share_tbl = `INSERT INTO share_tbl(user_email, answer_id, time)
-        VALUES ('${user_email}', '${answer_id}', '${new Date().toLocaleString()}')`;
+        VALUES ('${user_email}', '${answer_id}', '${dateTime}')`;
 
     db.query(insert_share_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
