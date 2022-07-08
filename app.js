@@ -881,7 +881,7 @@ app.get('/shares/:user_email', (req, res) => {
             console.log('Error from getting shares query: ', err);
         } else {
             if (rows.length === 0) {
-                res.send({});
+                res.send([]);
             } else {
                 res.send(rows);
             }
