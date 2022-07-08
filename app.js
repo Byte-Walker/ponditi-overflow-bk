@@ -17,9 +17,20 @@ const db = mysql.createConnection({
 db.connect();
 
 // ---------------------------------------- Helpers--------------------------------
-const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
-
+const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
 
 // ---------------------------------------- API routes --------------------------------
 
@@ -266,7 +277,9 @@ app.post('/updateprofile', (req, res) => {
 app.post('/createquestion', (req, res) => {
     const questionInfo = req.body;
     const d = new Date();
-    const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+    const dateTime = `${
+        months[d.getMonth()]
+    } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     const create_question_tbl = `CREATE TABLE question_tbl(
       question_id varchar(100) PRIMARY KEY NOT NULL,
@@ -375,7 +388,9 @@ app.get('/question/:question_id', (req, res) => {
 app.post('/createanswer', (req, res) => {
     const answerInfo = req.body;
     const d = new Date();
-    const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+    const dateTime = `${
+        months[d.getMonth()]
+    } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     const create_answer_tbl = `CREATE TABLE answer_tbl(
       answer_id varchar(100) PRIMARY KEY NOT NULL,
@@ -504,8 +519,8 @@ app.delete('/answers/:answer_id', (req, res) => {
 // ---------------------------------- Following table --------------------------------
 
 // write following table
-app.post('/createfollower', (req, res) => {
-    const { followed, follower } = req.body;
+app.post('/modifyfollower', (req, res) => {
+    const { followed, follower, mode } = req.body;
 
     // const followed = 'shahid';
     // const follower = 'faisal';
@@ -518,35 +533,51 @@ app.post('/createfollower', (req, res) => {
     const insert_following_tbl = `INSERT INTO following_tbl(followed, follower)
         VALUES ('${followed}', '${follower}')`;
 
-    db.query(insert_following_tbl, (err, rows, fields) => {
-        if (err?.errno === 1146) {
-            // Creating following_tbl if it doesn't exist
-            console.log(err.code);
-            db.query(create_following_tbl, (err, rows, fields) => {
-                if (err) {
-                    console.error(err.code);
-                    res.send(false);
-                }
-                console.log('following_tbl created successfully!');
-            });
+    const delete_following = `
+        DELETE FROM following_tbl
+        WHERE followed = '${followed}' and follower = '${follower}';
+    `;
 
-            // Insertig following data into following_tbl
-            db.query(insert_following_tbl, (err, rows, fields) => {
-                if (err) {
-                    console.error(err.code);
-                    res.send(false);
-                } else {
-                    console.log(
-                        'inserted following data into following_tbl after creating following_tbl'
-                    );
+    if (mode === 'add') {
+        db.query(insert_following_tbl, (err, rows, fields) => {
+            if (err?.errno === 1146) {
+                // Creating following_tbl if it doesn't exist
+                console.log(err.code);
+                db.query(create_following_tbl, (err, rows, fields) => {
+                    if (err) {
+                        console.error(err.code);
+                        res.send(false);
+                    }
+                    console.log('following_tbl created successfully!');
+                });
 
-                    res.send(true);
-                }
-            });
-        } else {
-            res.send(true);
-        }
-    });
+                // Insertig following data into following_tbl
+                db.query(insert_following_tbl, (err, rows, fields) => {
+                    if (err) {
+                        console.error(err.code);
+                        res.send(false);
+                    } else {
+                        console.log(
+                            'inserted following data into following_tbl after creating following_tbl'
+                        );
+
+                        res.send(true);
+                    }
+                });
+            } else {
+                res.send(true);
+            }
+        });
+    } else if (mode === 'delete') {
+        db.query(delete_following, (err, rows, fields) => {
+            if (err) {
+                console.log('Error from deleting following: ', err);
+                res.send(false);
+            } else {
+                res.send(true);
+            }
+        });
+    }
 });
 
 // get followers api from following_tbl
@@ -702,8 +733,10 @@ app.get('/upvoters/:answer_id', (req, res) => {
 app.post('/createnotification', (req, res) => {
     const { notification_title, user_email, notification_description } =
         req.body;
-        const d = new Date();
-        const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+    const d = new Date();
+    const dateTime = `${
+        months[d.getMonth()]
+    } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     // const notification_title = 'Test';
     // const notification_description = 'First test';
@@ -779,7 +812,9 @@ app.get('/notifications/:user_email', (req, res) => {
 app.post('/createshare', (req, res) => {
     const { user_email, answer_id } = req.body;
     const d = new Date();
-    const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+    const dateTime = `${
+        months[d.getMonth()]
+    } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
     // const user_email = 'mdshahidulridoy@gmail.com';
     // const answer_id = `1656879810929`;
