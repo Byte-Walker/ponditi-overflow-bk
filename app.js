@@ -871,7 +871,7 @@ app.get('/shares/:user_email', (req, res) => {
     const user_email = req.params.user_email;
 
     const get_shares_query = `
-        SELECT answer_tbl.question_id, question_tbl.question_description, answer_tbl.answer_id, answer_tbl.answer_description, answer_tbl.user_email, user_tbl.user_name, user_tbl.img_url
+        SELECT answer_tbl.question_id, question_tbl.question_description, answer_tbl.answer_id, answer_tbl.answer_description, answer_tbl.user_email, user_tbl.user_name, user_tbl.img_url, user_tbl.job
         FROM share_tbl, answer_tbl, question_tbl, user_tbl
         WHERE share_tbl.user_email = '${user_email}' and share_tbl.answer_id = answer_tbl.answer_id and answer_tbl.question_id = question_tbl.question_id and answer_tbl.user_email = user_tbl.user_email
     `;
