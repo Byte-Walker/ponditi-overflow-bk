@@ -917,6 +917,65 @@ app.get('/sharers/:answer_id', (req, res) => {
     });
 });
 
+// ---------------------------------- Searching --------------------------------
+app.get('/search/users/:str', (req, res) => {
+    const str = req.params.str;
+    const keywords = str.split('*');
+
+    // Making query for user search
+    let user_compare = `user_name LIKE "%${keywords[0]}%"`;
+
+    keywords.forEach((keyword) => {
+        keyword !== '' && (user_compare += ` OR user_name LIKE "%${keyword}%"`);
+    });
+
+    const user_search_query = `
+        SELECT *
+        FROM user_tbl
+        WHERE ${user_compare};
+    `;
+
+    // Performing search on user_tbl
+    db.query(user_search_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from user search: ' + err);
+        } else {
+            rows.forEach((row) => {
+                delete row.user_pass;
+            });
+            res.send(rows);
+        }
+    });
+});
+
+app.get('/search/questions/:str', (req, res) => {
+    const str = req.params.str;
+    const keywords = str.split('*');
+
+    // Making query for question search
+    let ques_compare = `question_description LIKE "%${keywords[0]}%"`;
+
+    keywords.forEach((keyword) => {
+        keyword !== '' &&
+            (ques_compare += ` OR question_description LIKE "%${keyword}%"`);
+    });
+
+    const ques_search_query = `
+        SELECT *
+        FROM question_tbl
+        WHERE ${ques_compare};
+    `;
+
+    // Performing search on ques_tbl
+    db.query(ques_search_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from question search: ' + err);
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
 app.listen(port, () => {
     console.log(`Ponditi overflow listening on port ${port}`);
 });
