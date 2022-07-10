@@ -731,34 +731,30 @@ app.get('/upvoters/:answer_id', (req, res) => {
 // ---------------------------------- Notifications table --------------------------------
 // write notification table
 app.post('/createnotification', (req, res) => {
-    const {
-        notification_title,
-        user_email,
-        notification_description,
-        answer_id,
-        type,
-    } = req.body;
+    const { provoker, receiver, mode, answer_id, seen } = req.body;
     const d = new Date();
     const dateTime = `${
         months[d.getMonth()]
     } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
-    // const notification_title = 'Test';
-    // const notification_description = 'First test';
-    // const user_email = 'mdshahidulridoy@gmail.com';
+    // const provoker = 'faisal@gmail.com';
+    // const receiver = 'shahid@gmail.com';
+    // const mode = 'upvote';
+    // const answer_id = '1657381487822';
+    // const seen = false;
 
     const create_notification_tbl = `CREATE TABLE notification_tbl(
         notification_id varchar(100) NOT NULL ,
-        user_email varchar(100) NOT NULL,
-        notification_title varchar(100) NOT NULL,
-        notification_description varchar(300) NOT NULL,
+        provoker varchar(100) NOT NULL,
+        receiver varchar(100) NOT NULL,
+        mode varchar(10) NOT NULL,
         answer_id varchar(100) NOT NULL,
-        type varchar(100),
+        seen varchar(10),
         time varchar(300)
         );`;
 
-    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, user_email, notification_title, notification_description, answer_id, type, time)
-        VALUES ('${Date.now()}', '${user_email}', '${notification_title}' ,'${notification_description}', ${answer_id}, ${type}, '${dateTime}')`;
+    const insert_notification_tbl = `INSERT INTO notification_tbl(notification_id, provoker, receiver, mode, answer_id, seen, time)
+        VALUES ('${Date.now()}', '${provoker}', '${receiver}' ,'${mode}', '${answer_id}', '${seen}', '${dateTime}')`;
 
     db.query(insert_notification_tbl, (err, rows, fields) => {
         if (err?.errno === 1146) {
@@ -791,13 +787,13 @@ app.post('/createnotification', (req, res) => {
 });
 
 // Get all the notifications
-app.get('/notifications/:user_email', (req, res) => {
+app.get('/getnotifications/:user_email', (req, res) => {
     const user_email = req.params.user_email;
 
     const get_notifications_query = `
     SELECT *
     FROM notification_tbl
-    WHERE user_email = '${user_email}';
+    WHERE receiver = '${user_email}';
     `;
 
     db.query(get_notifications_query, (err, rows, fields) => {
@@ -809,6 +805,33 @@ app.get('/notifications/:user_email', (req, res) => {
             } else {
                 res.send(rows);
             }
+        }
+    });
+});
+
+app.post('/updatenotificationstatus', (req, res) => {
+    const { notification_ids } = req.body;
+
+    // const notification_ids = [23, 34, 1657448174291, 466];
+
+    let str = notification_ids[0];
+
+    notification_ids.forEach((id, index) => {
+        index > 0 && (str += `, ${id}`);
+    });
+
+    const update_notifications_query = `
+        UPDATE notification_tbl
+        SET seen = 'true'
+        WHERE notification_id IN (${str})
+    `;
+
+    db.query(update_notifications_query, (err, rows, fields) => {
+        if (err) {
+            console.log('Error from update_notifications_query: ', err);
+            res.send(false);
+        } else {
+            res.send(true);
         }
     });
 });
