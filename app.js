@@ -480,6 +480,29 @@ app.get("/answers/:question_id", (req, res) => {
   });
 });
 
+// get a specific answer Os-Traveller
+app.get("/answer/:answer_id", (req, res) => {
+  const answer_id = req.params.answer_id;
+
+  const query = `
+        SELECT * 
+        FROM answer_tbl
+        NATURAL JOIN user_tbl
+        WHERE answer_id = ${answer_id};  
+    `;
+
+  db.query(query, (err, rows, fields) => {
+    if (err) {
+      console.error(err.code);
+    } else {
+      rows.forEach((row) => {
+        delete row.user_pass;
+      });
+      res.send(rows);
+    }
+  });
+});
+
 app.delete("/answers/:answer_id", (req, res) => {
   const answer_id = req.params.answer_id;
 
