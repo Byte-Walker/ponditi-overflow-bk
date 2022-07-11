@@ -1,0 +1,46 @@
+CREATE TABLE user_tbl(
+    user_email varchar(100) PRIMARY KEY NOT NULL ,
+    user_pass varchar(100),
+    user_name varchar(50),
+    img_url varchar(1000),
+    job varchar(50),
+    study varchar(50),
+    location varchar(50)
+    );
+CREATE TABLE question_tbl(
+        question_id varchar(100) PRIMARY KEY NOT NULL,
+        question_description varchar(500),
+        user_email varchar(50),
+        time varchar(20)
+        );
+CREATE TABLE answer_tbl(
+        answer_id varchar(100) PRIMARY KEY NOT NULL,
+        question_id varchar(100),
+        answer_description varchar(10000),
+        user_email varchar(50),
+        time varchar(20)
+    );
+    
+CREATE TABLE following_tbl(
+        followed varchar(100) NOT NULL ,
+        follower varchar(100) NOT NULL
+        );
+CREATE TABLE upvote_tbl(
+            answer_id varchar(100) NOT NULL ,
+            user_email varchar(100) NOT NULL
+            );
+            
+CREATE TABLE notification_tbl(
+    notification_id varchar(100) NOT NULL ,
+    provoker varchar(100) NOT NULL,
+    receiver varchar(100) NOT NULL,
+    mode varchar(10) NOT NULL,
+    answer_id varchar(100) NOT NULL,
+    seen varchar(10),
+    time varchar(300)
+    );
+CREATE TABLE share_tbl(
+    user_email varchar(100) NOT NULL ,
+    answer_id varchar(100) NOT NULL, 
+    time varchar(100)
+    );
