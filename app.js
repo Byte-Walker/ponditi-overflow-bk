@@ -836,6 +836,30 @@ app.post("/updatenotificationstatus", (req, res) => {
   });
 });
 
+// Get unseen notification api
+app.get("/newnotifications/:user_email", (req, res) => {
+  const user_email = req.params.user_email;
+
+  const get_notifications_query = `
+    SELECT *
+    FROM notification_tbl
+    WHERE receiver = '${user_email}' AND seen 'false';
+    `;
+
+  db.query(get_notifications_query, (err, rows, fields) => {
+    if (err) {
+      console.log("Error from getting notifications query: ", err);
+    } else {
+      if (rows.length === 0) {
+        res.send([]);
+        // if no response send empty array  -- Os-Traveller
+      } else {
+        res.send(rows);
+      }
+    }
+  });
+});
+
 // ---------------------------------- Share table --------------------------------
 
 // write share table
