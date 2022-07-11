@@ -389,11 +389,9 @@ app.post("/createanswer", (req, res) => {
   //     answer_description: `This is an awesome platform for learning and earning `,
   //     user_email: 'mdshahidulridoy@gmail.com',
   // };
-
+  const answer_id = Date.now();
   const insert_answer_tbl = `INSERT INTO answer_tbl(answer_id, question_id, answer_description, user_email, time)
-VALUES ('${Date.now()}', '${answerInfo.question_id}', '${answerInfo.answer_description}', '${
-    answerInfo.user_email
-  }', '${dateTime}')`;
+VALUES ('${answer_id}', '${answerInfo.question_id}', '${answerInfo.answer_description}', '${answerInfo.user_email}', '${dateTime}')`;
 
   db.query(insert_answer_tbl, (err, rows, fields) => {
     if (err?.errno === 1146) {
@@ -414,12 +412,12 @@ VALUES ('${Date.now()}', '${answerInfo.question_id}', '${answerInfo.answer_descr
           res.send(false);
         } else {
           console.log("inserted answer data into answer_tbl after creating answer_tbl");
-          res.send(true);
+          res.send(answer_id);
         }
       });
     } else {
       console.log("Inserted answer data into answer_tbl");
-      res.send(true);
+      res.send(answer_id);
     }
   });
 });
