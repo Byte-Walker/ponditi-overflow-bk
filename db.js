@@ -53,11 +53,11 @@ const create_upvote_tbl = `CREATE TABLE upvote_tbl(
 
 const create_notification_tbl = `CREATE TABLE notification_tbl(
     notification_id varchar(100) NOT NULL ,
-    user_email varchar(100) NOT NULL,
-    notification_title varchar(100) NOT NULL,
-    notification_description varchar(300) NOT NULL,
+    provoker varchar(100) NOT NULL,
+    receiver varchar(100) NOT NULL,
+    mode varchar(10) NOT NULL,
     answer_id varchar(100) NOT NULL,
-    type varchar(100),
+    seen varchar(10),
     time varchar(300)
 );`;
 

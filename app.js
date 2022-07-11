@@ -486,9 +486,8 @@ app.get("/answer/:answer_id", (req, res) => {
 
   const query = `
         SELECT * 
-        FROM answer_tbl
-        NATURAL JOIN user_tbl
-        WHERE answer_id = ${answer_id};  
+        FROM answer_tbl, user_tbl, question_tbl
+        WHERE answer_tbl.answer_id = ${answer_id} AND answer_tbl.user_email = user_tbl.user_email AND answer_tbl.question_id = question_tbl.question_id;  
     `;
 
   db.query(query, (err, rows, fields) => {
