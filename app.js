@@ -842,7 +842,7 @@ app.get("/newnotifications/:user_email", (req, res) => {
   const get_notifications_query = `
     SELECT *
     FROM notification_tbl
-    WHERE receiver = '${user_email}' AND seen 'false';
+    WHERE receiver = '${user_email}' AND seen = 'false';
     `;
 
   db.query(get_notifications_query, (err, rows, fields) => {
