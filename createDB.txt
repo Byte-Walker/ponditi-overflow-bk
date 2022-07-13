@@ -48,6 +48,5 @@ CREATE TABLE share_tbl(
 
 CREATE TABLE tags_tbl(
     tag_name varchar(50) PRIMARY KEY,
-    tag_color varchar(50),
-    
+    tag_color varchar(50)   
 )

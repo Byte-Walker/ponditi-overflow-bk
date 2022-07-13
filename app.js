@@ -297,13 +297,15 @@ app.post("/createquestion", (req, res) => {
       tags varchar(500)
       );`;
 
-  let color_values_query = `VALUES(${questionInfo.tags[0]}, ${
-    tagColors[Math.floor(Math.random() * 16)]
-  })`;
+  let color_values_query = `VALUES('${questionInfo.tags[0]}', '${
+    tagColors[Math.floor(Math.random() * 16)].code
+  }')`;
 
   questionInfo.tags.forEach((tag, index) => {
     if (index) {
-      color_values_query += `, (tag, ${tagColors[Math.floor(Math.random() * 16)]})`;
+      color_values_query += `, ('${questionInfo?.tags[index]}', '${
+        tagColors[Math.floor(Math.random() * 16)].code
+      }')`;
     }
   });
 
@@ -315,6 +317,7 @@ app.post("/createquestion", (req, res) => {
   db.query(insert_tags_tbl, (err, rows, fields) => {
     if (err) {
       console.log("Error while inserting tags!");
+      console.log(insert_tags_tbl);
     }
   });
 
