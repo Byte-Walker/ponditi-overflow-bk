@@ -486,7 +486,7 @@ app.get("/getuseranswers/:user_email", (req, res) => {
 
 // Get all answers
 app.get("/getallanswers", (req, res) => {
-  const get_all_answers = `SELECT answer_tbl.user_email, question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_name, img_url, job
+  const get_all_answers = `SELECT answer_tbl.user_email, tags, question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_name, img_url, job
   FROM question_tbl, answer_tbl, user_tbl
   WHERE question_tbl.question_id = answer_tbl.question_id and answer_tbl.user_email = user_tbl.user_email`;
   db.query(get_all_answers, (err, rows, fields) => {
