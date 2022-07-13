@@ -8,11 +8,12 @@ CREATE TABLE user_tbl(
     location varchar(50)
     );
 CREATE TABLE question_tbl(
-        question_id varchar(100) PRIMARY KEY NOT NULL,
-        question_description varchar(500),
-        user_email varchar(50),
-        time varchar(20)
-        );
+      question_id varchar(100) PRIMARY KEY NOT NULL,
+      question_description varchar(500),
+      user_email varchar(50),
+      time varchar(20),
+      tags varchar(20)
+      );
 CREATE TABLE answer_tbl(
         answer_id varchar(100) PRIMARY KEY NOT NULL,
         question_id varchar(100),
@@ -44,3 +45,9 @@ CREATE TABLE share_tbl(
     answer_id varchar(100) NOT NULL, 
     time varchar(100)
     );
+
+CREATE TABLE tags_tbl(
+    tag_name varchar(50) PRIMARY KEY,
+    tag_color varchar(50),
+    
+)
