@@ -449,9 +449,10 @@ app.post('/createanswer', (req, res) => {
     //     answer_description: `This is an awesome platform for learning and earning `,
     //     user_email: 'mdshahidulridoy@gmail.com',
     // };
+    const answerId = Date.now();
 
     const insert_answer_tbl = `INSERT INTO answer_tbl(answer_id, question_id, answer_description, user_email, time)
-        VALUES ('${Date.now()}', '${answerInfo.question_id}', '${
+        VALUES ('${answerId}', '${answerInfo.question_id}', '${
         answerInfo.answer_description
     }', '${answerInfo.user_email}', '${dateTime}')`;
 
@@ -476,12 +477,12 @@ app.post('/createanswer', (req, res) => {
                     console.log(
                         'inserted answer data into answer_tbl after creating answer_tbl'
                     );
-                    res.send(true);
+                    res.send(`${answerId}`);
                 }
             });
         } else {
             console.log('Inserted answer data into answer_tbl');
-            res.send(true);
+            res.send(`${answerId}`);
         }
     });
 });
