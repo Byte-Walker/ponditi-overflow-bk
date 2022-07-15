@@ -1,68 +1,68 @@
-const express = require("express");
-const mysql = require("mysql");
+const express = require('express');
+const mysql = require('mysql');
 const app = express();
-const cors = require("cors");
+const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 const port = 5500;
 
 // Create connection
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "ponditi_overflow",
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'ponditi_overflow',
 });
 
 db.connect();
 
 // ---------------------------------------- Helpers--------------------------------
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 // Total 16 colors
 const tagColors = [
-  { name: "blue", code: "rgb(185 28 28)" },
-  { name: "orange", code: "rgb(194 65 12)" },
-  { name: "amber", code: "rgb(180 83 9)" },
-  { name: "yellow", code: "rgb(161 98 7)" },
-  { name: "lime", code: "rgb(77 124 15)" },
-  { name: "green", code: "rgb(21 128 61)" },
-  { name: "emerald", code: "rgb(4 120 87)" },
-  { name: "teal", code: "rgb(15 118 110)" },
-  { name: "cyan", code: "rgb(14 116 144)" },
-  { name: "blue", code: "rgb(29 78 216)" },
-  { name: "indigo", code: "rgb(67 56 202)" },
-  { name: "violet", code: "rgb(109 40 217)" },
-  { name: "purple", code: "rgb(126 34 206)" },
-  { name: "fuchsia", code: "rgb(162 28 175)" },
-  { name: "pink", code: "rgb(190 24 93)" },
-  { name: "rose", code: "rgb(190 18 60)" },
+  { name: 'blue', code: 'rgb(185 28 28)' },
+  { name: 'orange', code: 'rgb(194 65 12)' },
+  { name: 'amber', code: 'rgb(180 83 9)' },
+  { name: 'yellow', code: 'rgb(161 98 7)' },
+  { name: 'lime', code: 'rgb(77 124 15)' },
+  { name: 'green', code: 'rgb(21 128 61)' },
+  { name: 'emerald', code: 'rgb(4 120 87)' },
+  { name: 'teal', code: 'rgb(15 118 110)' },
+  { name: 'cyan', code: 'rgb(14 116 144)' },
+  { name: 'blue', code: 'rgb(29 78 216)' },
+  { name: 'indigo', code: 'rgb(67 56 202)' },
+  { name: 'violet', code: 'rgb(109 40 217)' },
+  { name: 'purple', code: 'rgb(126 34 206)' },
+  { name: 'fuchsia', code: 'rgb(162 28 175)' },
+  { name: 'pink', code: 'rgb(190 24 93)' },
+  { name: 'rose', code: 'rgb(190 18 60)' },
 ];
 
 // ---------------------------------------- API routes --------------------------------
 
 // home route
-app.get("/", (req, res) => {
-  res.send("Server is running at port " + port);
+app.get('/', (req, res) => {
+  res.send('Server is running at port ' + port);
 });
 
 // ---------------------------------------- Authentication --------------------------------
 
 // Signup route
-app.post("/signup", (req, res) => {
+app.post('/signup', (req, res) => {
   const user = req.body;
 
   const create_user_tbl = `CREATE TABLE user_tbl(
@@ -87,7 +87,7 @@ app.post("/signup", (req, res) => {
           console.error(err.code);
           res.send(false);
         }
-        console.log("user_tbl created successfully!");
+        console.log('user_tbl created successfully!');
       });
 
       // Insertig user data into user_tbl
@@ -96,13 +96,15 @@ app.post("/signup", (req, res) => {
           console.error(err.code);
           res.send(false);
         } else {
-          console.log("inserted user data into user_tbl after creating user_tbl");
+          console.log(
+            'inserted user data into user_tbl after creating user_tbl'
+          );
           const fetch_user_query = `SELECT * FROM user_tbl 
     WHERE user_email = '${user.user_email}';`;
 
           db.query(fetch_user_query, (err, rows, fields) => {
             if (err) {
-              console.log("Error fetching data: ", err.code);
+              console.log('Error fetching data: ', err.code);
               res.send(false);
             } else {
               delete rows[0].user_pass;
@@ -117,7 +119,7 @@ app.post("/signup", (req, res) => {
 
       db.query(fetch_user_query, (err, rows, fields) => {
         if (err) {
-          console.log("Error fetching data: ", err.code);
+          console.log('Error fetching data: ', err.code);
           res.send(false);
         } else {
           delete rows[0].user_pass;
@@ -129,7 +131,7 @@ app.post("/signup", (req, res) => {
 });
 
 // Login route
-app.post("/login", (req, res) => {
+app.post('/login', (req, res) => {
   const requestedUser = req.body;
 
   let user;
@@ -137,7 +139,7 @@ app.post("/login", (req, res) => {
     WHERE user_email = '${requestedUser.user_email}';`;
   db.query(fetch_user, (err, rows, fields) => {
     if (err) {
-      console.log("Error from /login: ", err);
+      console.log('Error from /login: ', err);
     } else {
       user = rows[0];
       if (requestedUser.user_pass === user?.user_pass) {
@@ -150,7 +152,7 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.post("/sociallogin", (req, res) => {
+app.post('/sociallogin', (req, res) => {
   const { user_email, user_name, img_url } = req.body;
   // const user_email = 'mdshahidulridoy@gmail.co';
   // const user_name = 'Md Shahidul Islam';
@@ -175,11 +177,11 @@ app.post("/sociallogin", (req, res) => {
 
   db.query(fetch_user_query, (err, rows, fields) => {
     if (err?.code) {
-      console.log("Error fetching data: ", err.code);
+      console.log('Error fetching data: ', err.code);
       res.send(false);
     } else {
       const str = JSON.stringify(rows);
-      if (str === "[]") {
+      if (str === '[]') {
         db.query(insert_user_tbl, (err, rows, fields) => {
           if (err?.errno === 1146) {
             // Creating user_tbl if it doesn't exist
@@ -189,7 +191,7 @@ app.post("/sociallogin", (req, res) => {
                 console.error(err.code);
                 res.send(false);
               }
-              console.log("user_tbl created successfully!");
+              console.log('user_tbl created successfully!');
             });
 
             // Insertig user data into user_tbl
@@ -198,13 +200,15 @@ app.post("/sociallogin", (req, res) => {
                 console.error(err.code);
                 res.send(false);
               } else {
-                console.log("inserted user data into user_tbl after creating user_tbl");
+                console.log(
+                  'inserted user data into user_tbl after creating user_tbl'
+                );
                 const fetch_user_query = `SELECT * FROM user_tbl 
                                     WHERE user_email = '${user_email}';`;
 
                 db.query(fetch_user_query, (err, rows, fields) => {
                   if (err) {
-                    console.log("Error fetching data: ", err.code);
+                    console.log('Error fetching data: ', err.code);
                     res.send(false);
                   } else {
                     delete rows[0].user_pass;
@@ -216,7 +220,7 @@ app.post("/sociallogin", (req, res) => {
           } else {
             db.query(fetch_user_query, (err, rows, fields) => {
               if (err) {
-                console.log("Error fetching data: ", err.code);
+                console.log('Error fetching data: ', err.code);
                 res.send(false);
               } else {
                 delete rows[0].user_pass;
@@ -235,7 +239,7 @@ app.post("/sociallogin", (req, res) => {
 
 // ---------------------------------------- User table --------------------------------
 
-app.get("/profile/:user_email", (req, res) => {
+app.get('/profile/:user_email', (req, res) => {
   const user_email = req.params.user_email;
 
   const fetch_user_query = `SELECT * FROM user_tbl 
@@ -243,7 +247,7 @@ app.get("/profile/:user_email", (req, res) => {
 
   db.query(fetch_user_query, (err, rows, fields) => {
     if (err?.code) {
-      console.log("Error fetching data: ", err.code);
+      console.log('Error fetching data: ', err.code);
       res.send(false);
     } else {
       delete rows[0]?.user_pass;
@@ -253,7 +257,7 @@ app.get("/profile/:user_email", (req, res) => {
 });
 
 // Update profile
-app.post("/updateprofile", (req, res) => {
+app.post('/updateprofile', (req, res) => {
   const { user_email, job, study, location } = req.body;
 
   // const user_email = 'mdshahidulridoy@gmail.com', job = 'googler', study = 'buet', location = 'new york city';
@@ -264,14 +268,14 @@ app.post("/updateprofile", (req, res) => {
 
   db.query(update_profile, (err, rows, fields) => {
     if (err) {
-      console.log("Error from update profile: " + err.code);
+      console.log('Error from update profile: ' + err.code);
       res.send(false);
     } else {
       const fetch_user = `SELECT * FROM user_tbl 
                 WHERE user_email = '${user_email}';`;
       db.query(fetch_user, (err, rows, fields) => {
         if (err) {
-          console.log("Error from fetch user: " + err.code);
+          console.log('Error from fetch user: ' + err.code);
         } else {
           delete rows[0].user_pass;
           res.send(rows[0]);
@@ -284,10 +288,12 @@ app.post("/updateprofile", (req, res) => {
 // ---------------------------------------- Question table --------------------------------
 
 // Question route
-app.post("/createquestion", (req, res) => {
+app.post('/createquestion', (req, res) => {
   const questionInfo = req.body;
   const d = new Date();
-  const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const dateTime = `${
+    months[d.getMonth()]
+  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
   const create_question_tbl = `CREATE TABLE question_tbl(
       question_id varchar(100) PRIMARY KEY NOT NULL,
@@ -316,7 +322,7 @@ app.post("/createquestion", (req, res) => {
 
   db.query(insert_tags_tbl, (err, rows, fields) => {
     if (err) {
-      console.log("Error while inserting tags!");
+      console.log('Error while inserting tags!');
       console.log(insert_tags_tbl);
     }
   });
@@ -340,7 +346,7 @@ app.post("/createquestion", (req, res) => {
           console.error(err.code);
           res.send(false);
         }
-        console.log("question_tbl created successfully!");
+        console.log('question_tbl created successfully!');
       });
 
       // Insertig question data into question_tbl
@@ -349,19 +355,21 @@ app.post("/createquestion", (req, res) => {
           console.error(err.code);
           res.send(false);
         } else {
-          console.log("inserted question data into question_tbl after creating question_tbl");
+          console.log(
+            'inserted question data into question_tbl after creating question_tbl'
+          );
           res.send(true);
         }
       });
     } else {
-      console.log("Inserted question data into question_tbl");
+      console.log('Inserted question data into question_tbl');
       res.send(true);
     }
   });
 });
 
 // Get user specific questions
-app.get("/getuserquestions/:user_email", (req, res) => {
+app.get('/getuserquestions/:user_email', (req, res) => {
   const user_email = req.params.user_email;
 
   // const user_email = 'mdshahidulridoy@gmail.com';
@@ -381,7 +389,7 @@ app.get("/getuserquestions/:user_email", (req, res) => {
 });
 
 // Get all questions
-app.get("/getallquestions", (req, res) => {
+app.get('/getallquestions', (req, res) => {
   const get_all_questions = `SELECT user_email, question_id, question_description, user_name, time
     FROM question_tbl
     NATURAL JOIN user_tbl`;
@@ -395,7 +403,7 @@ app.get("/getallquestions", (req, res) => {
 });
 
 // get the info about a question
-app.get("/question/:question_id", (req, res) => {
+app.get('/question/:question_id', (req, res) => {
   const question_id = req.params.question_id;
 
   const query = `
@@ -416,10 +424,12 @@ app.get("/question/:question_id", (req, res) => {
 // ---------------------------------------- Answers table --------------------------------
 
 // Answer route
-app.post("/createanswer", (req, res) => {
+app.post('/createanswer', (req, res) => {
   const answerInfo = req.body;
   const d = new Date();
-  const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const dateTime = `${
+    months[d.getMonth()]
+  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
   const create_answer_tbl = `CREATE TABLE answer_tbl(
       answer_id varchar(100) PRIMARY KEY NOT NULL,
@@ -448,7 +458,7 @@ app.post("/createanswer", (req, res) => {
           console.error(err.code);
           res.send(false);
         }
-        console.log("answer_tbl created successfully!");
+        console.log('answer_tbl created successfully!');
       });
 
       // Insertig answer data into answer_tbl
@@ -457,19 +467,21 @@ app.post("/createanswer", (req, res) => {
           console.error(err.code);
           res.send(false);
         } else {
-          console.log("inserted answer data into answer_tbl after creating answer_tbl");
+          console.log(
+            'inserted answer data into answer_tbl after creating answer_tbl'
+          );
           res.send(`${answerId}`);
         }
       });
     } else {
-      console.log("Inserted answer data into answer_tbl");
+      console.log('Inserted answer data into answer_tbl');
       res.send(`${answerId}`);
     }
   });
 });
 
 // Get user specific answers
-app.get("/getuseranswers/:user_email", (req, res) => {
+app.get('/getuseranswers/:user_email', (req, res) => {
   let user_email = req.params.user_email;
   const get_user_answers = `SELECT *
   FROM question_tbl, answer_tbl, user_tbl
@@ -488,7 +500,7 @@ app.get("/getuseranswers/:user_email", (req, res) => {
 });
 
 // Get all answers
-app.get("/getallanswers", (req, res) => {
+app.get('/getallanswers', (req, res) => {
   const get_all_answers = `SELECT answer_tbl.user_email, tags, question_description, question_tbl.question_id, answer_description, answer_id, answer_tbl.time, user_name, img_url, job
   FROM question_tbl, answer_tbl, user_tbl
   WHERE question_tbl.question_id = answer_tbl.question_id and answer_tbl.user_email = user_tbl.user_email`;
@@ -502,7 +514,7 @@ app.get("/getallanswers", (req, res) => {
 });
 
 // get all the answers on a specific question
-app.get("/answers/:question_id", (req, res) => {
+app.get('/answers/:question_id', (req, res) => {
   const question_id = req.params.question_id;
 
   const query = `
@@ -525,7 +537,7 @@ app.get("/answers/:question_id", (req, res) => {
 });
 
 // get a specific answer Os-Traveller
-app.get("/answer/:answer_id", (req, res) => {
+app.get('/answer/:answer_id', (req, res) => {
   const answer_id = req.params.answer_id;
 
   const query = `
@@ -546,7 +558,7 @@ app.get("/answer/:answer_id", (req, res) => {
   });
 });
 
-app.delete("/answers/:answer_id", (req, res) => {
+app.delete('/answers/:answer_id', (req, res) => {
   const answer_id = req.params.answer_id;
 
   const query = `
@@ -556,7 +568,7 @@ app.delete("/answers/:answer_id", (req, res) => {
 
   db.query(query, (err, rows, fields) => {
     if (err) {
-      console.error("Error from answer delete: ", err);
+      console.error('Error from answer delete: ', err);
       res.send(false);
     } else {
       res.send(true);
@@ -567,7 +579,7 @@ app.delete("/answers/:answer_id", (req, res) => {
 // ---------------------------------- Following table --------------------------------
 
 // write following table
-app.post("/modifyfollower", (req, res) => {
+app.post('/modifyfollower', (req, res) => {
   const { followed, follower, mode } = req.body;
 
   // const followed = 'shahid';
@@ -586,7 +598,7 @@ app.post("/modifyfollower", (req, res) => {
         WHERE followed = '${followed}' and follower = '${follower}';
     `;
 
-  if (mode === "add") {
+  if (mode === 'add') {
     db.query(insert_following_tbl, (err, rows, fields) => {
       if (err?.errno === 1146) {
         // Creating following_tbl if it doesn't exist
@@ -596,7 +608,7 @@ app.post("/modifyfollower", (req, res) => {
             console.error(err.code);
             res.send(false);
           }
-          console.log("following_tbl created successfully!");
+          console.log('following_tbl created successfully!');
         });
 
         // Insertig following data into following_tbl
@@ -605,7 +617,9 @@ app.post("/modifyfollower", (req, res) => {
             console.error(err.code);
             res.send(false);
           } else {
-            console.log("inserted following data into following_tbl after creating following_tbl");
+            console.log(
+              'inserted following data into following_tbl after creating following_tbl'
+            );
 
             res.send(true);
           }
@@ -614,10 +628,10 @@ app.post("/modifyfollower", (req, res) => {
         res.send(true);
       }
     });
-  } else if (mode === "delete") {
+  } else if (mode === 'delete') {
     db.query(delete_following, (err, rows, fields) => {
       if (err) {
-        console.log("Error from deleting following: ", err);
+        console.log('Error from deleting following: ', err);
         res.send(false);
       } else {
         res.send(true);
@@ -627,7 +641,7 @@ app.post("/modifyfollower", (req, res) => {
 });
 
 // get followers api from following_tbl
-app.get("/followers/:user_email", (req, res) => {
+app.get('/followers/:user_email', (req, res) => {
   const user_email = req.params.user_email;
   const get_followers_query = `
     SELECT follower
@@ -637,7 +651,7 @@ app.get("/followers/:user_email", (req, res) => {
 
   db.query(get_followers_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting followers query: ", err);
+      console.log('Error from getting followers query: ', err);
     } else {
       if (rows.length === 0) {
         res.send({});
@@ -653,7 +667,7 @@ app.get("/followers/:user_email", (req, res) => {
 });
 
 // get followings api from following_tbl
-app.get("/followings/:user_email", (req, res) => {
+app.get('/followings/:user_email', (req, res) => {
   const user_email = req.params.user_email;
   const get_followings_query = `
     SELECT followed
@@ -663,7 +677,7 @@ app.get("/followings/:user_email", (req, res) => {
 
   db.query(get_followings_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting followings query: ", err);
+      console.log('Error from getting followings query: ', err);
     } else {
       if (rows.length === 0) {
         res.send({});
@@ -681,7 +695,7 @@ app.get("/followings/:user_email", (req, res) => {
 // ---------------------------------- Upvote table --------------------------------
 
 // write following table
-app.post("/createupvote", (req, res) => {
+app.post('/createupvote', (req, res) => {
   const { answer_id, user_email, mode } = req.body;
 
   // const answer_id = 11111111;
@@ -701,7 +715,7 @@ app.post("/createupvote", (req, res) => {
         WHERE user_email = '${user_email}' and answer_id = '${answer_id}'
     `;
 
-  if (mode === "add") {
+  if (mode === 'add') {
     db.query(insert_upvote_tbl, (err, rows, fields) => {
       if (err?.errno === 1146) {
         // Creating upvote_tbl if it doesn't exist
@@ -711,7 +725,7 @@ app.post("/createupvote", (req, res) => {
             console.error(err.code);
             res.send(false);
           }
-          console.log("upvote_tbl created successfully!");
+          console.log('upvote_tbl created successfully!');
         });
 
         // Insertig upvote data into upvote_tbl
@@ -720,7 +734,9 @@ app.post("/createupvote", (req, res) => {
             console.error(err.code);
             res.send(false);
           } else {
-            console.log("inserted upvote data into upvote_tbl after creating upvote_tbl");
+            console.log(
+              'inserted upvote data into upvote_tbl after creating upvote_tbl'
+            );
             res.send(true);
           }
         });
@@ -728,10 +744,10 @@ app.post("/createupvote", (req, res) => {
         res.send(true);
       }
     });
-  } else if (mode === "delete") {
+  } else if (mode === 'delete') {
     db.query(delete_upvote_tbl, (err, rows, fields) => {
       if (err) {
-        console.log("From delete upvote: " + err.code);
+        console.log('From delete upvote: ' + err.code);
         res.send(false);
       } else {
         res.send(true);
@@ -742,7 +758,7 @@ app.post("/createupvote", (req, res) => {
 
 // get all people who upvoted on an answer
 
-app.get("/upvoters/:answer_id", (req, res) => {
+app.get('/upvoters/:answer_id', (req, res) => {
   const answer_id = req.params.answer_id;
 
   const get_upvoters_query = `
@@ -754,7 +770,7 @@ app.get("/upvoters/:answer_id", (req, res) => {
 
   db.query(get_upvoters_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting upvoters query: ", err);
+      console.log('Error from getting upvoters query: ', err);
     } else {
       if (rows.length === 0) {
         res.send({});
@@ -774,10 +790,12 @@ app.get("/upvoters/:answer_id", (req, res) => {
 
 // ---------------------------------- Notifications table --------------------------------
 // write notification table
-app.post("/createnotification", (req, res) => {
+app.post('/createnotification', (req, res) => {
   const { provoker, receiver, mode, answer_id, seen } = req.body;
   const d = new Date();
-  const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const dateTime = `${
+    months[d.getMonth()]
+  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
   // const provoker = 'faisal@gmail.com';
   // const receiver = 'shahid@gmail.com';
@@ -807,7 +825,7 @@ app.post("/createnotification", (req, res) => {
           console.error(err.code);
           res.send(false);
         }
-        console.log("notification_tbl created successfully!");
+        console.log('notification_tbl created successfully!');
       });
 
       // Insertig notification data into notification_tbl
@@ -817,7 +835,7 @@ app.post("/createnotification", (req, res) => {
           res.send(false);
         } else {
           console.log(
-            "inserted notification data into notification_tbl after creating notification_tbl"
+            'inserted notification data into notification_tbl after creating notification_tbl'
           );
           res.send(true);
         }
@@ -829,7 +847,7 @@ app.post("/createnotification", (req, res) => {
 });
 
 // Get all the notifications
-app.get("/getnotifications/:user_email", (req, res) => {
+app.get('/getnotifications/:user_email', (req, res) => {
   const user_email = req.params.user_email;
 
   const get_notifications_query = `
@@ -840,7 +858,7 @@ app.get("/getnotifications/:user_email", (req, res) => {
 
   db.query(get_notifications_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting notifications query: ", err);
+      console.log('Error from getting notifications query: ', err);
     } else {
       if (rows.length === 0) {
         res.send([]);
@@ -852,7 +870,7 @@ app.get("/getnotifications/:user_email", (req, res) => {
   });
 });
 
-app.post("/updatenotificationstatus", (req, res) => {
+app.post('/updatenotificationstatus', (req, res) => {
   const { notification_ids } = req.body;
 
   // const notification_ids = [23, 34, 1657448174291, 466];
@@ -871,7 +889,7 @@ app.post("/updatenotificationstatus", (req, res) => {
 
   db.query(update_notifications_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from update_notifications_query: ", err);
+      console.log('Error from update_notifications_query: ', err);
       res.send(false);
     } else {
       res.send(true);
@@ -880,7 +898,7 @@ app.post("/updatenotificationstatus", (req, res) => {
 });
 
 // Get unseen notification api
-app.get("/newnotifications/:user_email", (req, res) => {
+app.get('/newnotifications/:user_email', (req, res) => {
   const user_email = req.params.user_email;
 
   const get_notifications_query = `
@@ -891,7 +909,7 @@ app.get("/newnotifications/:user_email", (req, res) => {
 
   db.query(get_notifications_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting notifications query: ", err);
+      console.log('Error from getting notifications query: ', err);
     } else {
       if (rows.length === 0) {
         res.send([]);
@@ -906,10 +924,12 @@ app.get("/newnotifications/:user_email", (req, res) => {
 // ---------------------------------- Share table --------------------------------
 
 // write share table
-app.post("/createshare", (req, res) => {
+app.post('/createshare', (req, res) => {
   const { user_email, answer_id } = req.body;
   const d = new Date();
-  const dateTime = `${months[d.getMonth()]} ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const dateTime = `${
+    months[d.getMonth()]
+  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
 
   // const user_email = 'mdshahidulridoy@gmail.com';
   // const answer_id = `1656879810929`;
@@ -932,7 +952,7 @@ app.post("/createshare", (req, res) => {
           console.error(err.code);
           res.send(false);
         }
-        console.log("share_tbl created successfully!");
+        console.log('share_tbl created successfully!');
       });
 
       // Insertig share data into share_tbl
@@ -941,7 +961,9 @@ app.post("/createshare", (req, res) => {
           console.error(err.code);
           res.send(false);
         } else {
-          console.log("inserted share data into share_tbl after creating share_tbl");
+          console.log(
+            'inserted share data into share_tbl after creating share_tbl'
+          );
 
           res.send(true);
         }
@@ -953,7 +975,7 @@ app.post("/createshare", (req, res) => {
 });
 
 // get shares api from following_tbl
-app.get("/shares/:user_email", (req, res) => {
+app.get('/shares/:user_email', (req, res) => {
   const user_email = req.params.user_email;
 
   const get_shares_query = `
@@ -964,7 +986,7 @@ app.get("/shares/:user_email", (req, res) => {
 
   db.query(get_shares_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting shares query: ", err);
+      console.log('Error from getting shares query: ', err);
     } else {
       if (rows.length === 0) {
         res.send([]);
@@ -977,7 +999,7 @@ app.get("/shares/:user_email", (req, res) => {
 
 // get all the shares of an answer
 
-app.get("/sharers/:answer_id", (req, res) => {
+app.get('/sharers/:answer_id', (req, res) => {
   const answer_id = req.params.answer_id;
 
   const get_shares_query = `
@@ -988,7 +1010,7 @@ app.get("/sharers/:answer_id", (req, res) => {
 
   db.query(get_shares_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from getting shares query: ", err);
+      console.log('Error from getting shares query: ', err);
     } else {
       if (rows.length === 0) {
         res.send({});
@@ -1004,15 +1026,15 @@ app.get("/sharers/:answer_id", (req, res) => {
 });
 
 // ---------------------------------- Searching --------------------------------
-app.get("/search/users/:str", (req, res) => {
+app.get('/search/users/:str', (req, res) => {
   const str = req.params.str;
-  const keywords = str.split("*");
+  const keywords = str.split('*');
 
   // Making query for user search
   let user_compare = `user_name LIKE "%${keywords[0]}%"`;
 
   keywords.forEach((keyword) => {
-    keyword !== "" && (user_compare += ` OR user_name LIKE "%${keyword}%"`);
+    keyword !== '' && (user_compare += ` OR user_name LIKE "%${keyword}%"`);
   });
 
   const user_search_query = `
@@ -1024,7 +1046,7 @@ app.get("/search/users/:str", (req, res) => {
   // Performing search on user_tbl
   db.query(user_search_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from user search: " + err);
+      console.log('Error from user search: ' + err);
     } else {
       rows.forEach((row) => {
         delete row.user_pass;
@@ -1034,15 +1056,16 @@ app.get("/search/users/:str", (req, res) => {
   });
 });
 
-app.get("/search/questions/:str", (req, res) => {
+app.get('/search/questions/:str', (req, res) => {
   const str = req.params.str;
-  const keywords = str.split("*");
+  const keywords = str.split('*');
 
   // Making query for question search
   let ques_compare = `question_description LIKE "%${keywords[0]}%"`;
 
   keywords.forEach((keyword) => {
-    keyword !== "" && (ques_compare += ` OR question_description LIKE "%${keyword}%"`);
+    keyword !== '' &&
+      (ques_compare += ` OR question_description LIKE "%${keyword}%"`);
   });
 
   const ques_search_query = `
@@ -1054,7 +1077,7 @@ app.get("/search/questions/:str", (req, res) => {
   // Performing search on ques_tbl
   db.query(ques_search_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from question search: " + err);
+      console.log('Error from question search: ' + err);
     } else {
       res.send(rows);
     }
@@ -1062,14 +1085,32 @@ app.get("/search/questions/:str", (req, res) => {
 });
 
 // Tag tble
-app.get("/tags", (req, res) => {
+app.get('/tags', (req, res) => {
   const tags_query = `
     SELECT *
     FROM tags_tbl
   `;
   db.query(tags_query, (err, rows, fields) => {
     if (err) {
-      console.log("Error from get tags: " + err);
+      console.log('Error from get tags: ' + err);
+    } else {
+      res.send(rows);
+    }
+  });
+});
+
+app.get('/getquestionsbytagname/:tagname', (req, res) => {
+  const tagname = req.params.tagname;
+
+  const query = `
+        SELECT *
+        FROM question_tbl
+        WHERE tags LIKE '${tagname},%' OR tags LIKE '% ${tagname},%' OR tags LIKE '% ${tagname}';
+    `;
+
+  db.query(query, (err, rows, fields) => {
+    if (err) {
+      console.log('Error from get questions by tagname: ', err);
     } else {
       res.send(rows);
     }
