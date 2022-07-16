@@ -25,20 +25,6 @@ const db = mysql.createConnection({
 db.connect();
 
 // ---------------------------------------- Helpers--------------------------------
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 // Total 16 colors
 const tagColors = [
