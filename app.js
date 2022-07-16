@@ -1144,7 +1144,7 @@ app.get('/getquestionsbytagname/:tagname', (req, res) => {
   const query = `
         SELECT *
         FROM question_tbl
-        WHERE tags LIKE '${tagname},%' OR tags LIKE '% ${tagname},%' OR tags LIKE '% ${tagname}';
+        WHERE tags LIKE '%#${tagname},%' OR tags LIKE '%#${tagname}';
     `;
 
   db.query(query, (err, rows, fields) => {
