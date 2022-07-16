@@ -19,7 +19,7 @@ CREATE TABLE answer_tbl(
         question_id varchar(100),
         answer_description varchar(10000),
         user_email varchar(50),
-        time varchar(20)
+        time varchar(50)
     );
     
 CREATE TABLE following_tbl(
@@ -38,12 +38,12 @@ CREATE TABLE notification_tbl(
     mode varchar(10) NOT NULL,
     answer_id varchar(100) NOT NULL,
     seen varchar(10),
-    time varchar(300)
+    time varchar(50)
     );
 CREATE TABLE share_tbl(
     user_email varchar(100) NOT NULL ,
     answer_id varchar(100) NOT NULL, 
-    time varchar(100)
+    time varchar(50)
     );
 
 CREATE TABLE tags_tbl(
