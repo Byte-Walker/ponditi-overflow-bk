@@ -2,16 +2,24 @@ const express = require('express');
 const mysql = require('mysql');
 const app = express();
 const cors = require('cors');
+require("dotenv").config();
+const port = process.env.PORT || 5500;
 app.use(cors());
 app.use(express.json());
-const port = 5500;
 
 // Create connection
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: '',
+//   database: 'ponditi_overflow',
+// });
+
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'ponditi_overflow',
+  host: 'sql6.freesqldatabase.com',
+  user: 'sql6506938',
+  password: 'TKTNhjddjS',
+  database: 'sql6506938',
 });
 
 db.connect();
