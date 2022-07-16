@@ -420,7 +420,7 @@ app.get('/getuserquestions/:user_email', (req, res) => {
 
 // Get all questions
 app.get('/getallquestions', (req, res) => {
-  const get_all_questions = `SELECT user_email, question_id, question_description, user_name, time
+  const get_all_questions = `SELECT user_email, question_id, question_description, user_name, time, tags
     FROM question_tbl
     NATURAL JOIN user_tbl`;
   db.query(get_all_questions, (err, rows, fields) => {
