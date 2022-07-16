@@ -57,6 +57,8 @@ const tagColors = [
 // home route
 app.get('/', (req, res) => {
   res.send('Server is running at port ' + port);
+
+  // test
 });
 
 // ---------------------------------------- Authentication --------------------------------
@@ -303,26 +305,52 @@ app.post('/createquestion', (req, res) => {
       tags varchar(500)
       );`;
 
-  let color_values_query = `VALUES('${questionInfo.tags[0]}', '${
-    tagColors[Math.floor(Math.random() * 16)].code
-  }')`;
-
-  questionInfo.tags.forEach((tag, index) => {
-    if (index) {
-      color_values_query += `, ('${questionInfo?.tags[index]}', '${
-        tagColors[Math.floor(Math.random() * 16)].code
-      }')`;
-    }
-  });
-
-  const insert_tags_tbl = `
-        INSERT INTO tags_tbl(tag_name, tag_color) 
-        ${color_values_query}
+  const get_tags_query = `
+      SELECT *
+      FROM tags_tbl
     `;
 
-  db.query(insert_tags_tbl, (err, rows, fields) => {
+  // Filtering out
+  db.query(get_tags_query, (err, rows, fields) => {
     if (err) {
-      console.log('Error while inserting tags! ', err);
+      console.log(
+        'Error while getting all the tags in add question api: ',
+        err
+      );
+    } else {
+      const tag_names = {};
+      rows.forEach((row) => {
+        tag_names[row.tag_name] = true;
+      });
+
+      const unique_tag_names = questionInfo.tags.filter((row) => {
+        return !tag_names[row];
+      });
+
+      let color_values_query = `VALUES('${unique_tag_names[0]}', '${
+        tagColors[Math.floor(Math.random() * 16)].code
+      }')`;
+
+      if (unique_tag_names.length) {
+        unique_tag_names.forEach((tag, index) => {
+          if (index) {
+            color_values_query += `, ('${unique_tag_names[index]}', '${
+              tagColors[Math.floor(Math.random() * 16)].code
+            }')`;
+          }
+        });
+
+        const insert_tags_tbl = `
+              INSERT INTO tags_tbl(tag_name, tag_color) 
+              ${color_values_query}
+          `;
+
+        db.query(insert_tags_tbl, (err, rows, fields) => {
+          if (err) {
+            console.log('Error while inserting tags! ', err);
+          }
+        });
+      }
     }
   });
 
