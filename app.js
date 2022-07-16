@@ -299,7 +299,7 @@ app.post('/createquestion', (req, res) => {
       question_id varchar(100) PRIMARY KEY NOT NULL,
       question_description varchar(500),
       user_email varchar(50),
-      time varchar(20),
+      time varchar(50),
       tags varchar(500)
       );`;
 
@@ -322,8 +322,7 @@ app.post('/createquestion', (req, res) => {
 
   db.query(insert_tags_tbl, (err, rows, fields) => {
     if (err) {
-      console.log('Error while inserting tags!');
-      console.log(insert_tags_tbl);
+      console.log('Error while inserting tags! ', err);
     }
   });
 

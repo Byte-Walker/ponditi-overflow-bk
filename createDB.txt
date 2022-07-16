@@ -11,8 +11,8 @@ CREATE TABLE question_tbl(
       question_id varchar(100) PRIMARY KEY NOT NULL,
       question_description varchar(500),
       user_email varchar(50),
-      time varchar(20),
-      tags varchar(20)
+      time varchar(50),
+      tags varchar(500)
       );
 CREATE TABLE answer_tbl(
         answer_id varchar(100) PRIMARY KEY NOT NULL,
