@@ -292,10 +292,13 @@ app.post('/updateprofile', (req, res) => {
 // Question route
 app.post('/createquestion', (req, res) => {
   const questionInfo = req.body;
-  const d = new Date();
-  const dateTime = `${
-    months[d.getMonth()]
-  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const date = new Date();
+
+  const month = date.toLocaleDateString('en-US', { month: 'long' });
+  const day = date.toLocaleDateString('en-US', { day: '2-digit' });
+  const year = date.getFullYear();
+
+  const dateTime = `${month} ${day} at ${year}`;
 
   const create_question_tbl = `CREATE TABLE question_tbl(
       question_id varchar(100) PRIMARY KEY NOT NULL,
@@ -424,7 +427,7 @@ app.get('/getallquestions', (req, res) => {
     if (err) {
       console.error(err.code);
     } else {
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -453,10 +456,13 @@ app.get('/question/:question_id', (req, res) => {
 // Answer route
 app.post('/createanswer', (req, res) => {
   const answerInfo = req.body;
-  const d = new Date();
-  const dateTime = `${
-    months[d.getMonth()]
-  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const date = new Date();
+
+  const month = date.toLocaleDateString('en-US', { month: 'long' });
+  const day = date.toLocaleDateString('en-US', { day: '2-digit' });
+  const year = date.getFullYear();
+
+  const dateTime = `${month} ${day} at ${year}`;
 
   const create_answer_tbl = `CREATE TABLE answer_tbl(
       answer_id varchar(100) PRIMARY KEY NOT NULL,
@@ -521,7 +527,7 @@ app.get('/getuseranswers/:user_email', (req, res) => {
       rows.forEach((row) => {
         delete row.user_pass;
       });
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -535,7 +541,7 @@ app.get('/getallanswers', (req, res) => {
     if (err) {
       console.error(err.code);
     } else {
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -558,7 +564,7 @@ app.get('/answers/:question_id', (req, res) => {
       rows.forEach((row) => {
         delete row.user_pass;
       });
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -580,7 +586,7 @@ app.get('/answer/:answer_id', (req, res) => {
       rows.forEach((row) => {
         delete row.user_pass;
       });
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -819,10 +825,13 @@ app.get('/upvoters/:answer_id', (req, res) => {
 // write notification table
 app.post('/createnotification', (req, res) => {
   const { provoker, receiver, mode, answer_id, seen } = req.body;
-  const d = new Date();
-  const dateTime = `${
-    months[d.getMonth()]
-  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const date = new Date();
+
+  const month = date.toLocaleDateString('en-US', { month: 'long' });
+  const day = date.toLocaleDateString('en-US', { day: '2-digit' });
+  const year = date.getFullYear();
+
+  const dateTime = `${month} ${day} at ${year}`;
 
   // const provoker = 'faisal@gmail.com';
   // const receiver = 'shahid@gmail.com';
@@ -953,10 +962,13 @@ app.get('/newnotifications/:user_email', (req, res) => {
 // write share table
 app.post('/createshare', (req, res) => {
   const { user_email, answer_id } = req.body;
-  const d = new Date();
-  const dateTime = `${
-    months[d.getMonth()]
-  } ${d.getDay()} at ${d.toLocaleTimeString()}`;
+  const date = new Date();
+
+  const month = date.toLocaleDateString('en-US', { month: 'long' });
+  const day = date.toLocaleDateString('en-US', { day: '2-digit' });
+  const year = date.getFullYear();
+
+  const dateTime = `${month} ${day} at ${year}`;
 
   // const user_email = 'mdshahidulridoy@gmail.com';
   // const answer_id = `1656879810929`;
@@ -1018,7 +1030,7 @@ app.get('/shares/:user_email', (req, res) => {
       if (rows.length === 0) {
         res.send([]);
       } else {
-        res.send(rows);
+        res.send(rows.reverse());
       }
     }
   });
@@ -1106,7 +1118,7 @@ app.get('/search/questions/:str', (req, res) => {
     if (err) {
       console.log('Error from question search: ' + err);
     } else {
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -1121,7 +1133,7 @@ app.get('/tags', (req, res) => {
     if (err) {
       console.log('Error from get tags: ' + err);
     } else {
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
@@ -1139,7 +1151,7 @@ app.get('/getquestionsbytagname/:tagname', (req, res) => {
     if (err) {
       console.log('Error from get questions by tagname: ', err);
     } else {
-      res.send(rows);
+      res.send(rows.reverse());
     }
   });
 });
